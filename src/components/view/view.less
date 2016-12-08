@@ -1,0 +1,27 @@
+
+.Main {
+  display: flex;
+  flex: 1;
+}
+
+.View {
+  flex: 1;
+  flex-direction: column;
+  overflow-x: scroll;
+}
+
+.ScrollView {
+  overflow-y: scroll;
+}
+
+.Content {
+  .View();
+  .Container();
+  display: flex;
+}
+
+.ScrollContent {
+  .ScrollView();
+  .Container();
+  display: flex;
+}
