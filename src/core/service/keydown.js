@@ -3,18 +3,26 @@ import Quay from 'quay'
 import {fromEvent} from 'most'
 
 import {signal} from 'signals/main'
-import {ACTIONS, GAME_STATES} from 'core/actions/global'
+import {ACTIONS} from 'core/actions/global'
 
 let quay = new Quay()
 
-const directionKeys = [
-  '<up>',
-  '<down>',
-  '<left>',
-  '<right>'
-]
+const keyMap = {
+  '<left>': '<left>',
+  '<right>': '<right>',
+  '<up>': '<up>',
+  '<down>': '<down>',
+  'A': '<left>',
+  'D': '<right>',
+  'W': '<up>',
+  'S': '<down>'
+}
 
-const keyFilter = event => {
+const directionKeys = Object.keys(keyMap)
+
+const getKey = key => ({key: keyMap[key]})
+
+export const directionKeyFilter = event => {
   return directionKeys.reduce((flag, key) => {
     return quay.pressed.has(key)
       ? true
@@ -22,47 +30,23 @@ const keyFilter = event => {
   }, false)
 }
 
-const keyMap = event => {
+export const directionKeyMap = event => {
   return directionKeys.reduce((e, key) => {
     return quay.pressed.has(key)
-      ? {key}
+      ? getKey(key)
       : e
   }, {key: null})
 }
 
-const eventStream = fromEvent('keydown', quay.stream('*'))
-  .filter(keyFilter)
-  .map(keyMap)
+/**
+ * Turns key presses into a keydown event passing the vkey key descriptor
+ */
+fromEvent('keydown', quay.stream('*'))
+  .filter(directionKeyFilter)
+  .map(directionKeyMap)
   .observe(event => {
     signal.emit({
       type: ACTIONS.KEYDOWN,
       payload: event
     })
   })
-
-signal.register((state, event) => {
-  if (state.game_state !== GAME_STATES.RUNNING) {
-    return state
-  }
-
-  if (event.type === ACTIONS.KEYDOWN) {
-    if (event.payload.key === '<up>') {
-      state.position[1]++
-    }
-
-    if (event.payload.key === '<down>') {
-      state.position[1]--
-    }
-
-    if (event.payload.key === '<left>') {
-      state.position[0]--
-    }
-
-    if (event.payload.key === '<right>') {
-      state.position[0]++
-    }
-    return state
-  }
-
-  return state
-})

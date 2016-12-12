@@ -4,7 +4,9 @@ import {render} from 'inferno-dom'
 import {signal} from 'signals/main'
 import MainView from 'views/main/main'
 
-import 'core/service/keydown'
+// Import services and updaters
+import 'core/service'
+import 'core/updates'
 
 const App = state => {
   return (

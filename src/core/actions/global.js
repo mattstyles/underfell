@@ -5,6 +5,6 @@ export const ACTIONS = keyMirror('GLOBAL', [
   'KEYDOWN'
 ])
 
-export const GAME_STATES = keyMirror('GS', [
+export const GAME_STATES = keyMirror('STATE', [
   'RUNNING'
 ])
