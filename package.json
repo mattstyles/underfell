@@ -46,10 +46,9 @@
   "keywords": [
     "game",
     "ogam",
-    "wrestling",
-    "inferno",
-    "raid",
-    "wrassling"
+    "rogue",
+    "roguelike",
+    "roguelite"
   ],
   "bugs": {
     "url": "https://github.com/mattstyles/shattered-sky/issues"
@@ -60,17 +59,17 @@
     "url": "git+https://github.com/mattstyles/shattered-sky.git"
   },
   "devDependencies": {
-    "babel-eslint": "^6.1.2",
+    "babel-eslint": "^7.1.1",
     "babel-plugin-inferno": "^0.7.7",
-    "babel-plugin-lodash": "^3.2.9",
+    "babel-plugin-lodash": "^3.2.10",
     "babel-plugin-transform-react-require": "^1.0.1",
-    "babel-preset-urban": "^0.5.0",
-    "babel-register": "^6.16.3",
+    "babel-preset-urban": "^1.0.0",
+    "babel-register": "^6.18.0",
     "babelify": "^7.3.0",
-    "browserify": "^13.1.0",
-    "budo": "^9.0.0",
+    "browserify": "^13.1.1",
+    "budo": "^9.3.0",
     "cpy-cli": "^1.0.1",
-    "envify": "^3.4.1",
+    "envify": "^4.0.0",
     "less": "^2.7.1",
     "less-plugin-autoprefix": "^1.5.1",
     "less-plugin-clean-css": "^1.5.1",
@@ -78,21 +77,21 @@
     "mkdirp": "^0.5.1",
     "rimraf": "^2.5.4",
     "simple-less-middleware": "^1.1.0",
-    "standard": "^7.1.2",
-    "tape": "^4.6.2"
+    "standard": "^8.6.0",
+    "tape": "^4.6.3"
   },
   "dependencies": {
-    "axios": "^0.13.1",
+    "axios": "^0.15.3",
     "classnames": "^2.2.5",
-    "eventemitter3": "^1.2.0",
+    "eventemitter3": "^2.0.2",
     "inferno": "^0.7.26",
     "inferno-component": "^0.7.26",
     "inferno-dom": "^0.7.26",
-    "lodash": "^4.16.1",
-    "most": "^1.0.1",
-    "normalize.css": "^4.2.0",
+    "lodash": "^4.17.2",
+    "most": "^1.1.1",
+    "normalize.css": "^5.0.0",
     "quay": "^0.5.0",
-    "raid": "^2.0.0",
+    "raid": "^2.1.0",
     "to-map": "^1.0.0"
   }
 }

@@ -1,10 +1,18 @@
 
 import {isArray} from 'lodash/fp'
 
+const genKey = (ns, key) => {
+  if (!ns) {
+    return key
+  }
+
+  return `${ns}:${key}`
+}
+
 const keyed = ns => {
   const keyMap = (map, key) => {
     if (typeof key === 'string') {
-      map[key] = `${ns}:${key}`
+      map[key] = genKey(ns, key)
       return map
     }
 
@@ -26,7 +34,11 @@ const keyed = ns => {
 }
 
 const keyMirror = (...args) => {
-  return args.reduce(keyed('NS'), {})
+  let key = args.slice(0, 1)[0]
+  if (typeof key !== 'string') {
+    return args.reduce(keyed(), {})
+  }
+  return args.slice(1).reduce(keyed(key), {})
 }
 
 export default keyMirror
