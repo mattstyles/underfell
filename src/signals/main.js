@@ -6,7 +6,7 @@ import {GAME_STATES} from 'core/actions/global'
 
 export const signal = new Signal({
   name: 'Raid',
-  game_state: GAME_STATES.RUNNING,
+  gameState: GAME_STATES.RUNNING,
   position: [0, 0]
 })
 

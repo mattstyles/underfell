@@ -39,7 +39,7 @@ export const directionKeyMap = event => {
 }
 
 /**
- * Turns key presses into a keydown event passing the vkey key descriptor
+ * Turns key presses into a keydown event passing the vkey descriptor
  */
 fromEvent('keydown', quay.stream('*'))
   .filter(directionKeyFilter)

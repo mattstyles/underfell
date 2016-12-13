@@ -6,7 +6,7 @@ import {ACTIONS, GAME_STATES} from 'core/actions/global'
  * Game running direction/movement key handler
  */
 signal.register((state, event) => {
-  if (state.game_state !== GAME_STATES.RUNNING) {
+  if (state.gameState !== GAME_STATES.RUNNING) {
     return state
   }
 
