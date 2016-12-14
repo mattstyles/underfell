@@ -1,4 +1,6 @@
 
+import Entities from 'components/entities/entities'
+
 const renderRow = (mat, y) => {
   let cells = []
   for (let x = 0; x < mat.shape[0]; x++) {
@@ -16,10 +18,11 @@ const renderGrid = mat => {
   return rows
 }
 
-const Map = ({mat}) => {
+const Map = ({mat, entities}) => {
   return (
     <div className='Map'>
       {renderGrid(mat)}
+      <Entities entities={entities} />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import MainView from 'views/main/main'
 import 'core/service'
 import 'core/updates'
 
-const App = state => {
+const App = ({state}) => {
   return (
     <MainView {...state} />
   )
