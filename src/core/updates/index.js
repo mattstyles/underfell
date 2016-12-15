@@ -1,2 +1,3 @@
 
 import './move'
+import './debug'
