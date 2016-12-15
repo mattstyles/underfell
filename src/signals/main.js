@@ -2,7 +2,7 @@
 import {Signal} from 'raid'
 import {adaptor} from 'raid-addons'
 
-import {GAME_STATES} from 'core/constants/global'
+import {GAME_STATES} from 'core/constants/game'
 import {generate} from 'core/service/map'
 
 const WIDTH = 64

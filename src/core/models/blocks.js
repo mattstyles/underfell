@@ -1,5 +1,6 @@
 
 import {getById as idRef} from 'core/utils'
+import {BLOCK_STATES} from 'core/constants/game'
 
 /**
  * Master immutable block record list
@@ -22,4 +23,16 @@ const blocks = [
  */
 export const getById = id => {
   return idRef(blocks, id)
+}
+
+/**
+ * Instance creator
+ */
+export const factory = {
+  create (id) {
+    return {
+      ...getById(id),
+      state: BLOCK_STATES.VISIBLE  // @TODO for now all blocks start visible
+    }
+  }
 }
