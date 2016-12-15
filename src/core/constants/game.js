@@ -10,3 +10,8 @@ export const BLOCK_STATES = keyMirror('BLOCK_STATE', [
   'DISCOVERED',
   'VISIBLE'
 ])
+
+export const BLOCK_SIZE = {
+  WIDTH: 9,
+  HEIGHT: 16
+}

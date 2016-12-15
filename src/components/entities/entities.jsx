@@ -1,4 +1,6 @@
 
+import {BLOCK_SIZE} from 'core/constants/game'
+
 const entityMapper = {
   'char': {
     color: 'rgb(218, 212, 94)',
@@ -23,8 +25,8 @@ const Entities = ({entities}) => {
     .map((entity, i) => {
       let style = {
         color: entity.color,
-        left: entity.position[0] * 9,
-        top: entity.position[1] * 16
+        left: entity.position[0] * BLOCK_SIZE.WIDTH,
+        top: entity.position[1] * BLOCK_SIZE.HEIGHT
       }
       return (
         <span
