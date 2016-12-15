@@ -3,7 +3,7 @@ import {signal} from 'signals/main'
 import {ACTIONS} from 'core/constants/actions'
 import {GAME_STATES} from 'core/constants/game'
 import {getById} from 'core/utils'
-import {updateVisibility} from 'core/updates/visibility'
+import {updateVisibility, clearVisibility} from 'core/updates/visibility'
 
 /**
  * Game running direction/movement key handler
@@ -33,6 +33,7 @@ signal.register((state, event) => {
       char.position[0]++
     }
 
+    state.map = clearVisibility(state.map)
     state.map = updateVisibility(state.map, char)
 
     return state

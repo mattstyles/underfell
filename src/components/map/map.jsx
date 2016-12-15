@@ -13,7 +13,7 @@ const renderBlock = block => {
   }
 
   if (block.state === BLOCK_STATES.DISCOVERED) {
-    renderProps.opacity = 0.5
+    renderProps.opacity = 0.25
   }
 
   return (

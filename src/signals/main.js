@@ -5,8 +5,8 @@ import {adaptor} from 'raid-addons'
 import {GAME_STATES} from 'core/constants/game'
 import {generate} from 'core/service/map'
 
-const WIDTH = 16
-const HEIGHT = 8
+const WIDTH = 32
+const HEIGHT = 16
 
 export const signal = new Signal({
   name: 'Raid',
@@ -14,7 +14,7 @@ export const signal = new Signal({
   entities: [
     {
       id: 'char',
-      position: [1, 1]
+      position: [12, 8]
     }
   ],
   map: generate(WIDTH, HEIGHT)

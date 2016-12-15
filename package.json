@@ -88,6 +88,7 @@
     "inferno-component": "^0.7.26",
     "inferno-dom": "^0.7.26",
     "lodash": "^4.17.2",
+    "mathutil": "^0.2.0",
     "most": "^1.1.1",
     "ndarray": "^1.0.18",
     "normalize.css": "^5.0.0",

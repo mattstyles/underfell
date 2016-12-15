@@ -9,11 +9,13 @@ const blocks = [
   {
     id: 0,
     char: '.',
-    color: 'rgb(68, 36, 52)'
+    color: 'rgb(68, 36, 52)',
+    isSolid: false
   },
   {
     id: 1,
     char: '#',
+    isSolid: true,
     color: 'rgb(133, 149, 161)'
   }
 ]
@@ -32,7 +34,7 @@ export const factory = {
   create (id) {
     return {
       ...getById(id),
-      state: BLOCK_STATES.VISIBLE  // @TODO for now all blocks start visible
+      state: BLOCK_STATES.INVISIBLE  // @TODO for now all blocks start visible
     }
   }
 }
