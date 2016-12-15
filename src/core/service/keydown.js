@@ -3,7 +3,7 @@ import Quay from 'quay'
 import {fromEvent} from 'most'
 
 import {signal} from 'signals/main'
-import {ACTIONS} from 'core/actions/global'
+import {ACTIONS} from 'core/constants/actions'
 
 let quay = new Quay()
 
@@ -46,7 +46,7 @@ fromEvent('keydown', quay.stream('*'))
   .map(directionKeyMap)
   .observe(event => {
     signal.emit({
-      type: ACTIONS.KEYDOWN,
+      type: ACTIONS.DIRKEYDOWN,
       payload: event
     })
   })

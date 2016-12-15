@@ -1,8 +1,9 @@
 
 import {signal} from 'signals/main'
-import {ACTIONS, GAME_STATES} from 'core/actions/global'
+import {ACTIONS} from 'core/constants/actions'
+import {GAME_STATES} from 'core/constants/game'
 
-import {getEntityById} from 'core/utils/entities'
+import {getById} from 'core/utils'
 
 /**
  * Game running direction/movement key handler
@@ -12,8 +13,9 @@ signal.register((state, event) => {
     return state
   }
 
-  if (event.type === ACTIONS.KEYDOWN) {
-    let char = getEntityById(state.entities, 'char')
+  // Direction keys
+  if (event.type === ACTIONS.DIRKEYDOWN) {
+    let char = getById(state.entities, 'char')
 
     if (event.payload.key === '<up>') {
       char.position[1]--

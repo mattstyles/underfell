@@ -23,7 +23,7 @@ const Entities = ({entities}) => {
     .map((entity, i) => {
       let style = {
         color: entity.color,
-        left: entity.position[0] * 8.42,
+        left: entity.position[0] * 9,
         top: entity.position[1] * 16
       }
       return (

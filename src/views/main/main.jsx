@@ -5,7 +5,6 @@ import Map from 'components/map/map'
 const MainView = ({map, entities}) => {
   return (
     <View main>
-      <h1>Hello World</h1>
       <div>{`x: ${entities[0].position[0]}`}</div>
       <div>{`y: ${entities[0].position[1]}`}</div>
       <Map mat={map} entities={entities} />
