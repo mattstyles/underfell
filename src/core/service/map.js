@@ -11,6 +11,12 @@ export const generate = (u, v) => {
       mat.set(x, y, factory.create(1))
       return
     }
+
+    if (x === 2 && y === 1) {
+      mat.set(x, y, factory.create(1))
+      return
+    }
+
     mat.set(x, y, factory.create(0))
     return
   })

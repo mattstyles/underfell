@@ -8,13 +8,13 @@ import {BLOCK_STATES} from 'core/constants/game'
 const blocks = [
   {
     id: 0,
-    char: ' ',
-    color: 'rgb(0, 0, 0)'
+    char: '.',
+    color: 'rgb(68, 36, 52)'
   },
   {
     id: 1,
     char: '#',
-    color: 'rgb(128, 128, 132)'
+    color: 'rgb(133, 149, 161)'
   }
 ]
 

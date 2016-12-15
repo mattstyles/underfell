@@ -1,7 +1,7 @@
 
 const entityMapper = {
   'char': {
-    color: '#FF0',
+    color: 'rgb(218, 212, 94)',
     gfx: '@'
   },
   'def': {
