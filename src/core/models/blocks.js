@@ -34,7 +34,7 @@ export const factory = {
   create (id) {
     return {
       ...getById(id),
-      state: BLOCK_STATES.INVISIBLE  // @TODO for now all blocks start visible
+      state: BLOCK_STATES.INVISIBLE
     }
   }
 }

@@ -1,13 +1,7 @@
 
 import {ndIterate} from 'core/utils/ndarray'
-import {BLOCK_STATES} from 'core/constants/game'
-import {Point, Vector2, toRadians} from 'mathutil'
-
-const ORIGIN_OFFSET = 0.5
-const RAY_ANGLE_INC = toRadians(5)
-const RAY_MAG_INC = 0.1
-const RAY_MAX_LENGTH = 4
-const RAY_MAX_TURN = toRadians(360)
+import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
+import {Vector2} from 'mathutil'
 
 /**
  * Clears the entire matrix to not visible
@@ -51,15 +45,6 @@ const checkBounds = (mat, x, y) => {
   return true
 }
 
-// @deprecated
-// const updateCell = (mat, x, y) => {
-//   if (!checkBounds(mat, x, y)) {
-//     return
-//   }
-//
-//   makeCellVisible(mat.get(x, y))
-// }
-
 /**
  * Returns if the current cell found at [x, y] blocks vision
  * @returns Boolean
@@ -87,22 +72,26 @@ const updateCellVisibility = (mat, x, y) => {
  * Takes a ray and projects it forward, lighting cells as it goes.
  * It'll bail if it hits a light blocker, lighting that blocker on the way out.
  */
-const castRay = (mat, ray, origin) => {
+const castRay = (mat, ray, light) => {
   // Check for 0 length ray which would create an infinite while
-  if (ray.length() <= 0.5) {
+  if (ray.length() <= 0.1) {
     return
   }
 
   let s = 1
   let r = ray
+  let [x, y] = light.position
 
   // Cast the ray by incrementing its magnitude
-  while (r.length() < RAY_MAX_LENGTH) {
+  while (r.length() < light.magnitude) {
     // Get ray current position
     let [i, j] = r.position()
 
-    // Offset by origin and integerise
-    let [u, v] = [origin.x + i | 0, origin.y + j | 0]
+    // Offset and integerise
+    let [u, v] = [
+      x + VISIBILITY.ORIGIN_OFFSET + i | 0,
+      y + VISIBILITY.ORIGIN_OFFSET + j | 0
+    ]
 
     // Update visibility of cell
     updateCellVisibility(mat, u, v)
@@ -113,20 +102,27 @@ const castRay = (mat, ray, origin) => {
     }
 
     // Grow ray scalar to increment cast
-    s += RAY_MAG_INC
+    s += VISIBILITY.RAY_MAG_INC
     r = ray.scalar(s)
   }
 }
 
 /**
- * Feed me a light source and a matrix and I'll light it right up!
+ * Feed me a light source and a matrix and I'll light that matrix right up!
  */
-export const updateVisibility = (mat, char) => {
-  let [x, y] = char.position
+export const updateVisibility = (mat, light) => {
   let ray = new Vector2(1, 0)
 
-  for (let angle = toRadians(0); angle < RAY_MAX_TURN; angle += RAY_ANGLE_INC) {
-    castRay(mat, ray.rotate(angle), new Point(x + ORIGIN_OFFSET, y + ORIGIN_OFFSET))
+  for (
+    let angle = light.startAngle;
+    angle < light.endAngle;
+    angle += VISIBILITY.RAY_ANGLE_INC
+  ) {
+    castRay(
+      mat,
+      ray.rotate(angle),
+      light
+    )
   }
 
   return mat
