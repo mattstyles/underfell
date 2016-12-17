@@ -92,7 +92,6 @@ const castRay = (mat, ray, light, cb) => {
 
   let r = ray
   let [x, y] = light.position
-  let closed = []
 
   // Cast the ray by incrementing its magnitude
   while (r.length() < light.magnitude) {
@@ -105,11 +104,10 @@ const castRay = (mat, ray, light, cb) => {
       y + VISIBILITY.ORIGIN_OFFSET + j | 0
     ]
 
-    // Update visibility of cell
     let cell = get(mat, u, v)
     if (cell) {
-      // Pass back the cell and the extent of the ray
-      cb(cell, 1 - (r.length() / light.magnitude))
+      // Pass back the cell, the extent of the ray and the position
+      cb(cell, 1 - (r.length() / light.magnitude), u, v)
     }
 
     // Perform check to see if this ray should continue casting
@@ -154,6 +152,9 @@ export const updateVisibility = (mat, char) => {
 export const updateLightmap = (mat, light) => {
   let ray = new Vector2(1, 0)
 
+  // Keep track of cells we have already visited and only add light once
+  let closed = []
+
   for (
     let angle = light.startAngle;
     angle < light.endAngle;
@@ -163,17 +164,24 @@ export const updateLightmap = (mat, light) => {
       mat,
       ray.rotate(angle),
       light,
-      (cell, lumination) => {
+      (cell, lumination, x, y) => {
+        // If we have already visited this cell then we're good to skip it,
+        // another light source could visit and up the light level though.
+        if (closed.find(cell => cell[0] === x && cell[1] === y)) {
+          return
+        }
+
+        closed.push([x, y])
+
         // Clamp luminosity 0.25...1
         // @TODO use a bezier here to make the light brighter close in
         // and then drop off
         let l = 0.25 + (lumination * 0.75)
-        cell.light = l
 
-        // Can we use light addition?
-        // cell.light += l
+        // Use light addition so that multiple light sources stack
+        cell.light += l
 
-        // Clamp to 1
+        // Clamp saturation to 1
         if (cell.light > 1) {
           cell.light = 1
         }
