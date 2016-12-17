@@ -17,7 +17,14 @@ export const BLOCK_SIZE = {
 }
 
 export const VISIBILITY = {
+  // Sets the visibility checks to centralise on a cell in the matrix
   ORIGIN_OFFSET: 0.5,
-  RAY_MAG_INC: 0.1,
-  RAY_ANGLE_INC: Math.PI / 90
+
+  // How frequently along the magnitude of the ray vector should we check
+  // for visibility?
+  RAY_MAG_INC: 1.1,
+
+  // Defines how many rays to cast, i.e. 1 degree = 360 rays, more work but
+  // greater accuracy
+  RAY_ANGLE_INC: Math.PI / 180
 }

@@ -1,7 +1,7 @@
 
 import {ndIterate} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
-import {Vector2} from 'mathutil'
+import {Vector2, Point, lerp} from 'mathutil'
 
 /**
  * Clears the entire matrix to not visible
@@ -30,9 +30,6 @@ const makeCellInvisible = cell => {
     : BLOCK_STATES.DISCOVERED
 }
 
-/**
- * Straight forward matrix bounds checker to stop access errors
- */
 const checkBounds = (mat, x, y) => {
   if (x < 0 || y < 0) {
     return false
@@ -45,85 +42,96 @@ const checkBounds = (mat, x, y) => {
   return true
 }
 
-/**
- * Returns if the current cell found at [x, y] blocks vision
- * @returns Boolean
- */
-const isBlocker = (mat, x, y) => {
-  if (!checkBounds(mat, x, y)) {
+const get = (mat, x, y) => {
+  const i = x | 0
+  const j = y | 0
+  return checkBounds(mat, i, j)
+    ? mat.get(i, j)
+    : null
+}
+
+const isLineBlocked = (mat, line) => {
+  // let c = get(mat, line.x, line.y)
+  // if (c && c.isSolid) {
+  //   return false
+  // }
+  let count = []
+
+  for (let i = 0; i <= 1; i += 0.1) {
+    let [x, y] = [lerp(i, line.origin.x, line.head.x), lerp(i, line.origin.y, line.head.y)]
+    let cell = get(mat, x, y)
+    if (cell && cell.isSolid) {
+      insert(count, {x: x | 0, y: y | 0})
+    }
+  }
+
+  return count.length
+}
+
+const insert = (map, point) => {
+  if (map.find(p => p.x === point.x && p.y === point.y)) {
+    return
+  }
+
+  map.push(point)
+}
+
+const MAG = 3
+
+const checkLine = (mat, line) => {
+  if (line.length() > MAG * 1.1) {
     return false
   }
 
-  return mat.get(x, y).isSolid
-}
-
-/**
- * Sets the cell at [x, y] to visible
- */
-const updateCellVisibility = (mat, x, y) => {
-  if (!checkBounds(mat, x, y)) {
-    return
+  if (isLineBlocked(mat, line) > 1) {
+    return false
   }
 
-  makeCellVisible(mat.get(x, y))
+  return true
 }
 
-/**
- * Takes a ray and projects it forward, lighting cells as it goes.
- * It'll bail if it hits a light blocker, lighting that blocker on the way out.
- */
-const castRay = (mat, ray, light) => {
-  // Check for 0 length ray which would create an infinite while
-  if (ray.length() <= 0.1) {
-    return
-  }
+const generateLightMap = (mat, lights) => {
+  let map = []
 
-  let s = 1
-  let r = ray
-  let [x, y] = light.position
+  lights.forEach(light => {
+    const origin = new Point(light.position[0] + 0.5, light.position[1] + 0.5)
+    for (let i = -MAG; i <= MAG; i++) {
+      for (let j = -MAG; j <= MAG; j++) {
+        let head = new Point(origin.x + i, origin.y + j)
+        let line = new Vector2({
+          head,
+          origin
+        })
 
-  // Cast the ray by incrementing its magnitude
-  while (r.length() < light.magnitude) {
-    // Get ray current position
-    let [i, j] = r.position()
-
-    // Offset and integerise
-    let [u, v] = [
-      x + VISIBILITY.ORIGIN_OFFSET + i | 0,
-      y + VISIBILITY.ORIGIN_OFFSET + j | 0
-    ]
-
-    // Update visibility of cell
-    updateCellVisibility(mat, u, v)
-
-    // Perform check to see if this ray should continue casting
-    if (isBlocker(mat, u, v)) {
-      break
+        // Quick check that candidate isn't too far away
+        if (checkLine(mat, line)) {
+          insert(map, line)
+        }
+      }
     }
+  })
 
-    // Grow ray scalar to increment cast
-    s += VISIBILITY.RAY_MAG_INC
-    r = ray.scalar(s)
-  }
+  return map
 }
 
 /**
  * Feed me a light source and a matrix and I'll light that matrix right up!
  */
-export const updateVisibility = (mat, light) => {
-  let ray = new Vector2(1, 0)
+export const updateVisibility = (mat, origin, lights) => {
 
-  for (
-    let angle = light.startAngle;
-    angle < light.endAngle;
-    angle += VISIBILITY.RAY_ANGLE_INC
-  ) {
-    castRay(
-      mat,
-      ray.rotate(angle),
-      light
-    )
-  }
+  // Calculate light map, which denotes candidates for visibility
+  let lightmap = generateLightMap(mat, lights)
+
+  // console.log(lightmap)
+
+  lightmap.forEach(block => {
+    let cell = get(mat, block.x, block.y)
+    if (!cell) {
+      return
+    }
+
+    makeCellVisible(cell)
+  })
 
   return mat
 }

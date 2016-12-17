@@ -33,22 +33,37 @@ signal.register((state, event) => {
       char.position[0]++
     }
 
-    let light = {
-      startAngle: 0,
-      endAngle: Math.PI * 2,
-      magnitude: 4,
-      position: char.position
-    }
+    // let light = {
+    //   startAngle: 0,
+    //   endAngle: Math.PI * 2,
+    //   magnitude: 4,
+    //   position: char.position
+    // }
 
     state.map = clearVisibility(state.map)
-    state.map = updateVisibility(state.map, light)
+    // state.map = updateVisibility(state.map, light)
+    //
+    // state.map = updateVisibility(state.map, {
+    //   startAngle: 0,
+    //   endAngle: Math.PI,
+    //   magnitude: 2,
+    //   position: [8, 0]
+    // })
 
-    state.map = updateVisibility(state.map, {
-      startAngle: 0,
-      endAngle: Math.PI,
-      magnitude: 2,
-      position: [8, 0]
-    })
+    state.map = updateVisibility(state.map, char, [
+      {
+        startAngle: 0,
+        endAngle: Math.PI * 2,
+        magnitude: 4,
+        position: char.position
+      },
+      // {
+      //   startAngle: 0,
+      //   endAngle: Math.PI,
+      //   magnitude: 2,
+      //   position: [8, 0]
+      // }
+    ])
 
     return state
   }
