@@ -6,7 +6,8 @@ import {getById} from 'core/utils'
 import {
   updateVisibility,
   clearVisibility,
-  updateLightmap
+  updateLightmap,
+  updateLights
 } from 'core/updates/visibility'
 
 /**
@@ -44,40 +45,31 @@ signal.register((state, event) => {
       position: char.position
     }
 
-    let vision = {
-      startAngle: 0,
-      endAngle: Math.PI * 2,
-      magnitude: 6,
-      position: char.position
-    }
-
-    state.map = clearVisibility(state.map)
-    state.map = updateLightmap(state.map, light)
-
-    // Create test wall light
-    state.map = updateLightmap(state.map, {
+    let dummyLight = {
       startAngle: 0,
       endAngle: Math.PI,
       magnitude: 2,
       position: [8, 0]
-    })
+    }
 
+    let vision = {
+      startAngle: 0,
+      endAngle: Math.PI * 2,
+      magnitude: 10,
+      position: char.position
+    }
+
+    // Clear the visibility and light data from the map
+    state.map = clearVisibility(state.map)
+
+    // Update the light map
+    state.map = updateLights(state.map, [
+      light,
+      dummyLight
+    ])
+
+    // Update the visibility map
     state.map = updateVisibility(state.map, vision)
-
-    // state.map = updateVisibility(state.map, char, [
-    //   {
-    //     startAngle: 0,
-    //     endAngle: Math.PI * 2,
-    //     magnitude: 4,
-    //     position: char.position
-    //   },
-    //   // {
-    //   //   startAngle: 0,
-    //   //   endAngle: Math.PI,
-    //   //   magnitude: 2,
-    //   //   position: [8, 0]
-    //   // }
-    // ])
 
     return state
   }

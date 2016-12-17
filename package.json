@@ -82,6 +82,7 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
+    "bezier-easing": "^2.0.3",
     "classnames": "^2.2.5",
     "eventemitter3": "^2.0.2",
     "inferno": "^0.7.26",

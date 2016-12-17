@@ -1,7 +1,10 @@
 
+import BezierEasing from 'bezier-easing'
 import {ndIterate} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
 import {Vector2} from 'mathutil'
+
+const easing = BezierEasing(0, 0, 0, 1)
 
 /**
  * Clears the entire matrix to not visible
@@ -13,7 +16,7 @@ export const clearVisibility = mat => {
 }
 
 /**
- * Takes a cell and makes it visible
+ * Takes a cell and makes it visible if it is currently lighted
  */
 const makeCellVisible = cell => {
   if (cell.light > 0) {
@@ -72,6 +75,9 @@ const updateCellVisibility = (mat, x, y) => {
   makeCellVisible(mat.get(x, y))
 }
 
+/**
+ * Returns the cell or null if [x, y] is out of bounds
+ */
 const get = (mat, x, y) => {
   if (!checkBounds(mat, x, y)) {
     return null
@@ -81,8 +87,8 @@ const get = (mat, x, y) => {
 }
 
 /**
- * Takes a ray and projects it forward, lighting cells as it goes.
- * It'll bail if it hits a light blocker, lighting that blocker on the way out.
+ * Takes a ray and projects it forward, executing the callback as it goes.
+ * It'll bail if it hits a solid block, firing the callback on the way out.
  */
 const castRay = (mat, ray, light, cb) => {
   // Check for 0 length ray which would create an infinite while
@@ -106,7 +112,7 @@ const castRay = (mat, ray, light, cb) => {
 
     let cell = get(mat, u, v)
     if (cell) {
-      // Pass back the cell, the extent of the ray and the position
+      // Pass back the cell, the extent of the raycast and the position
       cb(cell, 1 - (r.length() / light.magnitude), u, v)
     }
 
@@ -149,7 +155,10 @@ export const updateVisibility = (mat, char) => {
   return mat
 }
 
-export const updateLightmap = (mat, light) => {
+/**
+ * Feed me a light and I'll populate a light map
+ */
+const updateLightmap = (mat, light) => {
   let ray = new Vector2(1, 0)
 
   // Keep track of cells we have already visited and only add light once
@@ -173,10 +182,12 @@ export const updateLightmap = (mat, light) => {
 
         closed.push([x, y])
 
-        // Clamp luminosity 0.25...1
-        // @TODO use a bezier here to make the light brighter close in
-        // and then drop off
-        let l = 0.25 + (lumination * 0.75)
+        // Clamp luminosity 0.25...1.
+        // Apply easing to the luminosity to create a better light falloff.
+        // @TODO light describes block opacity currently but better could be
+        // to have coloured lights so cell.light would become a magnitude and
+        // a colour, the renderer would then perform the blend.
+        let l = 0.25 + (easing(lumination) * 0.75)
 
         // Use light addition so that multiple light sources stack
         cell.light += l
@@ -189,11 +200,25 @@ export const updateLightmap = (mat, light) => {
     )
   }
 
-  // Might need to make light source opacity 1
+  // Update light source block to be fully lighted
   let source = get(mat, ...light.position)
   if (source) {
     source.light = 1
   }
 
   return mat
+}
+
+/**
+ * Work the matrix through all light sources, applying light transforms as
+ * we go. Spit out the matrix with the light map applied to it.
+ * @TODO can perform a simple distance check based on position towards eye to
+ * skip the expensive light calculations altogether, this function will
+ * become a bottleneck with many lights so something to reduce the light count
+ * should be highly beneficial.
+ */
+export const updateLights = (mat, lights) => {
+  return lights.reduce((map, light) => {
+    return updateLightmap(map, light)
+  }, mat)
 }
