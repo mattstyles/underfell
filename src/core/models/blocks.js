@@ -34,7 +34,8 @@ export const factory = {
   create (id) {
     return {
       ...getById(id),
-      state: BLOCK_STATES.INVISIBLE
+      state: BLOCK_STATES.INVISIBLE,
+      light: 0
     }
   }
 }

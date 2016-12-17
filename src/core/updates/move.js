@@ -3,7 +3,11 @@ import {signal} from 'signals/main'
 import {ACTIONS} from 'core/constants/actions'
 import {GAME_STATES} from 'core/constants/game'
 import {getById} from 'core/utils'
-import {updateVisibility, clearVisibility} from 'core/updates/visibility'
+import {
+  updateVisibility,
+  clearVisibility,
+  updateLightmap
+} from 'core/updates/visibility'
 
 /**
  * Game running direction/movement key handler
@@ -33,37 +37,47 @@ signal.register((state, event) => {
       char.position[0]++
     }
 
-    // let light = {
-    //   startAngle: 0,
-    //   endAngle: Math.PI * 2,
-    //   magnitude: 4,
-    //   position: char.position
-    // }
+    let light = {
+      startAngle: 0,
+      endAngle: Math.PI * 2,
+      magnitude: 3,
+      position: char.position
+    }
+
+    let vision = {
+      startAngle: 0,
+      endAngle: Math.PI * 2,
+      magnitude: 6,
+      position: char.position
+    }
 
     state.map = clearVisibility(state.map)
-    // state.map = updateVisibility(state.map, light)
-    //
-    // state.map = updateVisibility(state.map, {
-    //   startAngle: 0,
-    //   endAngle: Math.PI,
-    //   magnitude: 2,
-    //   position: [8, 0]
-    // })
+    state.map = updateLightmap(state.map, light)
 
-    state.map = updateVisibility(state.map, char, [
-      {
-        startAngle: 0,
-        endAngle: Math.PI * 2,
-        magnitude: 4,
-        position: char.position
-      },
-      // {
-      //   startAngle: 0,
-      //   endAngle: Math.PI,
-      //   magnitude: 2,
-      //   position: [8, 0]
-      // }
-    ])
+    // Create test wall light
+    state.map = updateLightmap(state.map, {
+      startAngle: 0,
+      endAngle: Math.PI,
+      magnitude: 2,
+      position: [8, 0]
+    })
+
+    state.map = updateVisibility(state.map, vision)
+
+    // state.map = updateVisibility(state.map, char, [
+    //   {
+    //     startAngle: 0,
+    //     endAngle: Math.PI * 2,
+    //     magnitude: 4,
+    //     position: char.position
+    //   },
+    //   // {
+    //   //   startAngle: 0,
+    //   //   endAngle: Math.PI,
+    //   //   magnitude: 2,
+    //   //   position: [8, 0]
+    //   // }
+    // ])
 
     return state
   }

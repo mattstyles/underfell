@@ -9,7 +9,7 @@ const renderBlock = block => {
   }
 
   let renderProps = {
-    opacity: 1
+    opacity: block.light
   }
 
   if (block.state === BLOCK_STATES.DISCOVERED) {
