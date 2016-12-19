@@ -46,10 +46,10 @@ signal.register((state, event) => {
     }
 
     let dummyLight = {
-      startAngle: 0,
-      endAngle: Math.PI,
+      startAngle: Math.PI * -0.5,
+      endAngle: Math.PI * 0.5,
       magnitude: 2,
-      position: [8, 0]
+      position: [0, 8]
     }
 
     let vision = {
