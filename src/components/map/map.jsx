@@ -3,16 +3,16 @@ import Entities from 'components/entities/entities'
 import {ndMap} from 'core/utils/ndarray'
 import {BLOCK_STATES, BLOCK_SIZE} from 'core/constants/game'
 
-const renderBlock = block => {
-  if (block.state === BLOCK_STATES.INVISIBLE) {
+const renderCell = cell => {
+  if (cell.state === BLOCK_STATES.INVISIBLE) {
     return null
   }
 
   let renderProps = {
-    opacity: block.light
+    opacity: cell.light
   }
 
-  if (block.state === BLOCK_STATES.DISCOVERED) {
+  if (cell.state === BLOCK_STATES.DISCOVERED) {
     renderProps.opacity = 0.25
   }
 
@@ -20,22 +20,24 @@ const renderBlock = block => {
     <span
       className='Block'
       style={{
-        color: block.color,
-        left: block.x * BLOCK_SIZE.WIDTH,
-        top: block.y * BLOCK_SIZE.HEIGHT,
+        color: cell.color,
+        left: cell.position[0] * BLOCK_SIZE.WIDTH,
+        top: cell.position[1] * BLOCK_SIZE.HEIGHT,
         ...renderProps
       }}
-    >{block.char}</span>
+    >{cell.char}</span>
   )
 }
 
+// @TODO this is a rendering bottleneck, need to split up which parts of the
+// map get rendered to stop re-drawing unchanging cells. Use pure render
+// mixin for componentShouldUpdate.
 const render = mat => {
   return ndMap(mat, (mat, x, y) => {
     let block = mat.get(x, y)
-    return renderBlock({
+    return renderCell({
       ...block,
-      x,
-      y
+      position: [x, y]
     })
   })
 }

@@ -17,7 +17,9 @@ const App = ({state}) => {
 let main = document.querySelector('.js-main')
 
 signal.observe(state => {
+  console.time('render')
   render(<App state={state} />, main)
+  console.timeEnd('render')
 }, error => {
   console.error('signal error')
   console.error(error)

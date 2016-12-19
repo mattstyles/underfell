@@ -141,9 +141,7 @@ export const updateVisibility = (mat, char) => {
       mat,
       ray.rotate(angle),
       char,
-      (cell) => {
-        makeCellVisible(cell)
-      }
+      makeCellVisible
     )
   }
 
@@ -164,6 +162,34 @@ const updateLightmap = (mat, light) => {
   // Keep track of cells we have already visited and only add light once
   let closed = []
 
+  // Updates the cell with light calculation
+  const updateCellLight = (cell, lumination, x, y) => {
+    // If we have already visited this cell then we're good to skip it,
+    // another light source could visit and up the light level though.
+    if (closed.find(cell => cell[0] === x && cell[1] === y)) {
+      return
+    }
+
+    closed.push([x, y])
+
+    // Clamp luminosity 0.25...1.
+    // Apply easing to the luminosity to create a better light falloff.
+    // @TODO light describes block opacity currently but better could be
+    // to have coloured lights so cell.light would become a magnitude and
+    // a colour, the renderer would then perform the blend.
+    // @TODO this 0.25 could be extracted to a global, or ambient, light
+    // level for all blocks.
+    let l = 0.25 + (easing(lumination) * 0.75)
+
+    // Use light addition so that multiple light sources stack
+    cell.light += l
+
+    // Clamp saturation to 1
+    if (cell.light > 1) {
+      cell.light = 1
+    }
+  }
+
   for (
     let angle = light.startAngle;
     angle < light.endAngle;
@@ -173,30 +199,7 @@ const updateLightmap = (mat, light) => {
       mat,
       ray.rotate(angle),
       light,
-      (cell, lumination, x, y) => {
-        // If we have already visited this cell then we're good to skip it,
-        // another light source could visit and up the light level though.
-        if (closed.find(cell => cell[0] === x && cell[1] === y)) {
-          return
-        }
-
-        closed.push([x, y])
-
-        // Clamp luminosity 0.25...1.
-        // Apply easing to the luminosity to create a better light falloff.
-        // @TODO light describes block opacity currently but better could be
-        // to have coloured lights so cell.light would become a magnitude and
-        // a colour, the renderer would then perform the blend.
-        let l = 0.25 + (easing(lumination) * 0.75)
-
-        // Use light addition so that multiple light sources stack
-        cell.light += l
-
-        // Clamp saturation to 1
-        if (cell.light > 1) {
-          cell.light = 1
-        }
-      }
+      updateCellLight
     )
   }
 
@@ -215,10 +218,14 @@ const updateLightmap = (mat, light) => {
  * @TODO can perform a simple distance check based on position towards eye to
  * skip the expensive light calculations altogether, this function will
  * become a bottleneck with many lights so something to reduce the light count
- * should be highly beneficial.
+ * should be highly beneficial. The size of the map, i.e. number of DOM elements
+ * to manipulate, is a far stronger bottle neck, first optimisations should be
+ * put into only updating or rendering parts of maps at a time.
+ * @TODO some lighting could also be treated as static i.e. torches could do
+ * their light calcs only once, when they are created, updated or destroyed.
+ * This would up the complexity though as each block would have to check its
+ * light sources to get the correct light level when there is a lighting change.
  */
 export const updateLights = (mat, lights) => {
-  return lights.reduce((map, light) => {
-    return updateLightmap(map, light)
-  }, mat)
+  return lights.reduce(updateLightmap, mat)
 }

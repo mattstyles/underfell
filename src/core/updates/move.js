@@ -41,7 +41,7 @@ signal.register((state, event) => {
     let light = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 3,
+      magnitude: 4,
       position: char.position
     }
 

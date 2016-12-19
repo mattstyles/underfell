@@ -21,7 +21,9 @@ export const VISIBILITY = {
   ORIGIN_OFFSET: 0.5,
 
   // How frequently along the magnitude of the ray vector should we check
-  // for visibility?
+  // for visibility? If visibility raises to a high number (just 15 is about
+  // enough) this this magnitude scalar needs to be lowered so that the vis
+  // check does not jump entire cells.
   RAY_MAG_INC: 1.1,
 
   // Defines how many rays to cast, i.e. 1 degree = 360 rays, more work but
