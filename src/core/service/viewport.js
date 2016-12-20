@@ -17,7 +17,7 @@ export const getViewport = (mat, x, y) => {
   const half = [SIZES.VIEWPORT_WIDTH * 0.5, SIZES.VIEWPORT_HEIGHT * 0.5]
   const origin = [
     clamp(x - half[0], 0, max[0]),
-    clamp(y - half[0], 0, max[1])
+    clamp(y - half[1], 0, max[1])
   ]
 
   return [
