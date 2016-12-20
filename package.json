@@ -85,6 +85,7 @@
     "bezier-easing": "^2.0.3",
     "classnames": "^2.2.5",
     "eventemitter3": "^2.0.2",
+    "fast-simplex-noise": "^3.2.0",
     "inferno": "^0.7.26",
     "inferno-component": "^0.7.26",
     "inferno-dom": "^0.7.26",
@@ -95,6 +96,7 @@
     "normalize.css": "^5.0.0",
     "quay": "^0.5.0",
     "raid": "^2.1.0",
+    "seedrandom": "^2.4.2",
     "to-map": "^1.0.0"
   }
 }
