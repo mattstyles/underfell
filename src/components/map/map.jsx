@@ -1,7 +1,7 @@
 
 import Entities from 'components/entities/entities'
 import {ndMap} from 'core/utils/ndarray'
-import {BLOCK_STATES, BLOCK_SIZE} from 'core/constants/game'
+import {BLOCK_STATES, SIZES} from 'core/constants/game'
 
 const renderCell = cell => {
   if (cell.state === BLOCK_STATES.INVISIBLE) {
@@ -21,8 +21,8 @@ const renderCell = cell => {
       className='Block'
       style={{
         color: cell.color,
-        left: cell.position[0] * BLOCK_SIZE.WIDTH,
-        top: cell.position[1] * BLOCK_SIZE.HEIGHT,
+        left: cell.position[0] * SIZES.CELL_WIDTH,
+        top: cell.position[1] * SIZES.CELL_HEIGHT,
         ...renderProps
       }}
     >{cell.char}</span>

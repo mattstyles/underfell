@@ -11,9 +11,13 @@ export const BLOCK_STATES = keyMirror('BLOCK_STATE', [
   'VISIBLE'
 ])
 
-export const BLOCK_SIZE = {
-  WIDTH: 9,
-  HEIGHT: 16
+export const SIZES = {
+  CELL_WIDTH: 9,
+  CELL_HEIGHT: 16,
+  VIEWPORT_WIDTH: 32,
+  VIEWPORT_HEIGHT: 16,
+  MAP_WIDTH: 32,
+  MAP_HEIGHT: 16
 }
 
 export const VISIBILITY = {

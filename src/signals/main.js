@@ -2,11 +2,8 @@
 import {Signal} from 'raid'
 import {adaptor} from 'raid-addons'
 
-import {GAME_STATES} from 'core/constants/game'
+import {GAME_STATES, SIZES} from 'core/constants/game'
 import {generate} from 'core/service/map'
-
-const WIDTH = 32
-const HEIGHT = 16
 
 export const signal = new Signal({
   name: 'Raid',
@@ -17,7 +14,7 @@ export const signal = new Signal({
       position: [1, 1]
     }
   ],
-  map: generate(WIDTH, HEIGHT)
+  map: generate(SIZES.MAP_WIDTH, SIZES.MAP_HEIGHT)
 })
 
 export const connect = adaptor(signal)

@@ -6,7 +6,6 @@ import {getById} from 'core/utils'
 import {
   updateVisibility,
   clearVisibility,
-  updateLightmap,
   updateLights
 } from 'core/updates/visibility'
 

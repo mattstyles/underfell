@@ -4,6 +4,7 @@ import {ndIterate} from 'core/utils/ndarray'
 import {factory} from 'core/models/blocks'
 
 import data from '../../../map.json'
+console.log(data)
 
 export const generate = (u, v) => {
   let grid = new Array(u * v)
