@@ -2,6 +2,7 @@
 import Entities from 'components/entities/entities'
 import {ndMap} from 'core/utils/ndarray'
 import {BLOCK_STATES, SIZES} from 'core/constants/game'
+import {getViewport} from 'core/service/viewport'
 
 const renderCell = cell => {
   if (cell.state === BLOCK_STATES.INVISIBLE) {
@@ -42,11 +43,20 @@ const render = mat => {
   })
 }
 
+/**
+ * Calculate the viewport, render just the viewport and pass the offset to
+ * the entities renderer so they can render in the correct places.
+ */
 const Map = ({mat, entities}) => {
+  let char = entities[0]
+  let v = getViewport(mat, ...char.position)
   return (
     <div className='Map'>
-      {render(mat)}
-      <Entities entities={entities} />
+      {render(mat.hi(v[2], v[3]).lo(v[0], v[1]))}
+      <Entities
+        entities={entities}
+        translate={[-v[0], -v[1]]}
+      />
     </div>
   )
 }

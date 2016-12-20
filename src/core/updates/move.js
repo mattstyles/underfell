@@ -58,6 +58,8 @@ signal.register((state, event) => {
       position: char.position
     }
 
+    // @TODO use viewport to clamp cell updates
+
     // Clear the visibility and light data from the map
     state.map = clearVisibility(state.map)
 

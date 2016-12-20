@@ -17,11 +17,18 @@ const getEntity = id => {
   return entity || entityMapper['def']
 }
 
-const Entities = ({entities}) => {
+const Entities = ({entities, translate}) => {
   let e = entities
     .map(entity => Object.assign(getEntity(entity.id), {
-      position: entity.position
+      position: [
+        entity.position[0] + translate[0],
+        entity.position[1] + translate[1]
+      ]
     }))
+    .filter(entity => {
+      // @TODO only render those entities with visibility
+      return true
+    })
     .map((entity, i) => {
       let style = {
         color: entity.color,
