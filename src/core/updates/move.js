@@ -1,7 +1,7 @@
 
 import {signal} from 'signals/main'
 import {ACTIONS} from 'core/constants/actions'
-import {GAME_STATES} from 'core/constants/game'
+import {GAME_STATES, CHUNK_STATES} from 'core/constants/game'
 import {getById} from 'core/utils'
 import {
   updateVisibility,
@@ -40,7 +40,7 @@ signal.register((state, event) => {
     let light = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 4,
+      magnitude: 3,
       position: char.position
     }
 
@@ -54,7 +54,7 @@ signal.register((state, event) => {
     let vision = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 10,
+      magnitude: 3,
       position: char.position
     }
 
@@ -67,10 +67,14 @@ signal.register((state, event) => {
     state.map = updateLights(state.map, [
       light,
       dummyLight
-    ])
+    ], vision)
 
     // Update the visibility map
     state.map = updateVisibility(state.map, vision)
+
+    // How many dirty chunks?
+    console.log('dirty', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.DIRTY))
+    console.log('transient', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.TRANSIENT))
 
     return state
   }

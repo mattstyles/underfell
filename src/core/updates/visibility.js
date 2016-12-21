@@ -1,7 +1,7 @@
 
 import BezierEasing from 'bezier-easing'
 import ndarray from 'ndarray'
-import {Vector2} from 'mathutil'
+import {Vector2, euclidean} from 'mathutil'
 
 import {ndIterate} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
@@ -138,6 +138,10 @@ const castRay = (mat, ray, light, cb) => {
   }
 }
 
+/**
+ * Flags a chunk as dirty, used when a cell changes to flag to the renderer to
+ * redraw this chunk.
+ */
 const updateChunk = (chunks, x, y) => {
   let chunk = getChunk(chunks, x, y)
   if (!chunk) {
@@ -245,17 +249,25 @@ const updateLightmap = (map, light) => {
 /**
  * Work the matrix through all light sources, applying light transforms as
  * we go. Spit out the matrix with the light map applied to it.
- * @TODO can perform a simple distance check based on position towards eye to
- * skip the expensive light calculations altogether, this function will
- * become a bottleneck with many lights so something to reduce the light count
- * should be highly beneficial. The size of the map, i.e. number of DOM elements
- * to manipulate, is a far stronger bottle neck, first optimisations should be
- * put into only updating or rendering parts of maps at a time.
+ * We perform a distance check on the light partly to remove unnecessary calcs
+ * here but mainly so that the dirty chunks array is accurate, meaning we try
+ * to restrict overdraw when we render the map.
  * @TODO some lighting could also be treated as static i.e. torches could do
  * their light calcs only once, when they are created, updated or destroyed.
  * This would up the complexity though as each block would have to check its
  * light sources to get the correct light level when there is a lighting change.
  */
-export const updateLights = (map, lights) => {
-  return lights.reduce(updateLightmap, map)
+export const updateLights = (map, lights, vision) => {
+  return lights
+    .filter(light => {
+      // Remove lights too far from vision
+      return Math.abs(euclidean({
+        x: light.position[0],
+        y: light.position[1]
+      }, {
+        x: vision.position[0],
+        y: vision.position[1]
+      })) < vision.magnitude
+    })
+    .reduce(updateLightmap, map)
 }
