@@ -1,11 +1,12 @@
 
 import BezierEasing from 'bezier-easing'
 import ndarray from 'ndarray'
-import {Vector2, euclidean} from 'mathutil'
+import {Vector2} from 'mathutil'
 
 import {ndIterate} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
 import {getChunk, makeDirty, makeClean} from 'core/models/chunks'
+import {distance} from 'core/utils'
 
 const easing = BezierEasing(0, 0, 0, 1)
 
@@ -261,13 +262,15 @@ export const updateLights = (map, lights, vision) => {
   return lights
     .filter(light => {
       // Remove lights too far from vision
-      return Math.abs(euclidean({
-        x: light.position[0],
-        y: light.position[1]
-      }, {
-        x: vision.position[0],
-        y: vision.position[1]
-      })) < vision.magnitude + light.magnitude
+      // return Math.abs(euclidean({
+      //   x: light.position[0],
+      //   y: light.position[1]
+      // }, {
+      //   x: vision.position[0],
+      //   y: vision.position[1]
+      // })) < vision.magnitude + light.magnitude
+
+      return distance(light.position, vision.position) < vision.magnitude + light.magnitude
     })
     .reduce(updateLightmap, map)
 }

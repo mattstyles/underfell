@@ -1,4 +1,6 @@
 
+import {euclidean} from 'mathutil'
+
 /**
  * Expects an array of objects with an id prop
  */
@@ -25,4 +27,17 @@ export class Rect {
       point[1] >= this.p1[1] &&
       point[1] <= this.p2[1]
   }
+}
+
+/**
+ * Distance helper for two points
+ */
+export const distance = (p1, p2) => {
+  return Math.abs(euclidean({
+    x: p1[0],
+    y: p1[1]
+  }, {
+    x: p2[0],
+    y: p2[1]
+  }))
 }
