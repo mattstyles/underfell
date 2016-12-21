@@ -267,7 +267,7 @@ export const updateLights = (map, lights, vision) => {
       }, {
         x: vision.position[0],
         y: vision.position[1]
-      })) < vision.magnitude
+      })) < vision.magnitude + light.magnitude
     })
     .reduce(updateLightmap, map)
 }

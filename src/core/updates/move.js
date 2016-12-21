@@ -40,7 +40,7 @@ signal.register((state, event) => {
     let light = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 3,
+      magnitude: 4,
       position: char.position
     }
 
@@ -48,13 +48,13 @@ signal.register((state, event) => {
       startAngle: Math.PI * -0.5,
       endAngle: Math.PI * 0.5,
       magnitude: 2,
-      position: [0, 8]
+      position: [0, 1]
     }
 
     let vision = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 3,
+      magnitude: 10,
       position: char.position
     }
 
