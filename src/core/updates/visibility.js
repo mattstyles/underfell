@@ -1,18 +1,24 @@
 
 import BezierEasing from 'bezier-easing'
+import ndarray from 'ndarray'
+import {Vector2} from 'mathutil'
+
 import {ndIterate} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
-import {Vector2} from 'mathutil'
+import {getChunk, makeDirty, makeClean} from 'core/models/chunks'
 
 const easing = BezierEasing(0, 0, 0, 1)
 
 /**
  * Clears the entire matrix to not visible
  */
-export const clearVisibility = mat => {
-  return ndIterate(mat, (mat, x, y) => {
+export const clearVisibility = map => {
+  let mat = ndarray(map.data, [map.width, map.height])
+  ndIterate(mat, (mat, x, y) => {
     makeCellInvisible(mat.get(x, y))
   })
+  map.chunks.forEach(makeClean)
+  return map
 }
 
 /**
@@ -61,7 +67,13 @@ const isBlocker = (mat, x, y) => {
     return false
   }
 
-  return mat.get(x, y).isSolid
+  let cell = mat.get(x, y)
+  if (!cell) {
+    console.warn('no cell', x, y)
+    return false
+  }
+
+  return cell.isSolid
 }
 
 /**
@@ -126,10 +138,21 @@ const castRay = (mat, ray, light, cb) => {
   }
 }
 
+const updateChunk = (chunks, x, y) => {
+  let chunk = getChunk(chunks, x, y)
+  if (!chunk) {
+    console.warn('no chunk found', x, y)
+    return chunks
+  }
+  makeDirty(chunk)
+  return chunks
+}
+
 /**
  * Feed me a light source and a matrix and I'll light that matrix right up!
  */
-export const updateVisibility = (mat, char) => {
+export const updateVisibility = (map, char) => {
+  let mat = ndarray(map.data, [map.width, map.height])
   let ray = new Vector2(1, 0)
 
   for (
@@ -141,7 +164,10 @@ export const updateVisibility = (mat, char) => {
       mat,
       ray.rotate(angle),
       char,
-      makeCellVisible
+      (cell, lum, u, v) => {
+        makeCellVisible(cell)
+        updateChunk(map.chunks, u, v)
+      }
     )
   }
 
@@ -150,13 +176,14 @@ export const updateVisibility = (mat, char) => {
   // update the light position cell and continue unabated.
   updateCellVisibility(mat, ...char.position)
 
-  return mat
+  return map
 }
 
 /**
  * Feed me a light and I'll populate a light map
  */
-const updateLightmap = (mat, light) => {
+const updateLightmap = (map, light) => {
+  let mat = ndarray(map.data, [map.width, map.height])
   let ray = new Vector2(1, 0)
 
   // Keep track of cells we have already visited and only add light once
@@ -188,6 +215,9 @@ const updateLightmap = (mat, light) => {
     if (cell.light > 1) {
       cell.light = 1
     }
+
+    // Update the chunk dirty flag
+    updateChunk(map.chunks, x, y)
   }
 
   for (
@@ -209,7 +239,7 @@ const updateLightmap = (mat, light) => {
     source.light = 1
   }
 
-  return mat
+  return map
 }
 
 /**
@@ -226,6 +256,6 @@ const updateLightmap = (mat, light) => {
  * This would up the complexity though as each block would have to check its
  * light sources to get the correct light level when there is a lighting change.
  */
-export const updateLights = (mat, lights) => {
-  return lights.reduce(updateLightmap, mat)
+export const updateLights = (map, lights) => {
+  return lights.reduce(updateLightmap, map)
 }

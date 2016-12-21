@@ -84,6 +84,7 @@
     "axios": "^0.15.3",
     "bezier-easing": "^2.0.3",
     "classnames": "^2.2.5",
+    "deep-equal": "^1.0.1",
     "eventemitter3": "^2.0.2",
     "fast-simplex-noise": "^3.2.0",
     "inferno": "^0.7.26",

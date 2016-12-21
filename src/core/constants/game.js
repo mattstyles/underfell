@@ -11,13 +11,21 @@ export const BLOCK_STATES = keyMirror('BLOCK_STATE', [
   'VISIBLE'
 ])
 
+export const CHUNK_STATES = keyMirror('CHUNK_STATE', [
+  'CLEAN',
+  'TRANSIENT',
+  'DIRTY'
+])
+
 export const SIZES = {
   CELL_WIDTH: 9,
   CELL_HEIGHT: 16,
   VIEWPORT_WIDTH: 32,
   VIEWPORT_HEIGHT: 16,
-  MAP_WIDTH: 128,
-  MAP_HEIGHT: 64
+  MAP_WIDTH: 32,
+  MAP_HEIGHT: 16,
+  CHUNK_WIDTH: 8,
+  CHUNK_HEIGHT: 8
 }
 
 export const VISIBILITY = {

@@ -7,7 +7,7 @@ const MainView = ({map, entities}) => {
     <View main>
       <div>{`x: ${entities[0].position[0]}`}</div>
       <div>{`y: ${entities[0].position[1]}`}</div>
-      <Map mat={map} entities={entities} />
+      <Map map={map} entities={entities} />
     </View>
   )
 }
