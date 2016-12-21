@@ -40,7 +40,7 @@ signal.register((state, event) => {
     let light = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 4,
+      magnitude: 5,
       position: char.position
     }
 
@@ -73,8 +73,8 @@ signal.register((state, event) => {
     state.map = updateVisibility(state.map, vision)
 
     // How many dirty chunks?
-    console.log('dirty', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.DIRTY))
-    console.log('transient', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.TRANSIENT))
+    // console.log('dirty', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.DIRTY))
+    // console.log('transient', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.TRANSIENT))
 
     return state
   }
