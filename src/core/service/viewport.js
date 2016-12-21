@@ -5,6 +5,7 @@
 
 import {SIZES} from 'core/constants/game'
 import {clamp} from 'mathutil'
+import {Rect} from 'core/utils'
 
 /**
  * @param mat <ndarray> describing the map, used for bounds
@@ -20,10 +21,11 @@ export const getViewport = (mat, x, y) => {
     clamp(y - half[1], 0, max[1])
   ]
 
-  return [
+  return new Rect([
     origin[0],
-    origin[1],
+    origin[1]
+  ], [
     origin[0] + SIZES.VIEWPORT_WIDTH,
     origin[1] + SIZES.VIEWPORT_HEIGHT
-  ]
+  ])
 }

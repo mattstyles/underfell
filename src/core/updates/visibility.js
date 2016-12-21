@@ -262,14 +262,6 @@ export const updateLights = (map, lights, vision) => {
   return lights
     .filter(light => {
       // Remove lights too far from vision
-      // return Math.abs(euclidean({
-      //   x: light.position[0],
-      //   y: light.position[1]
-      // }, {
-      //   x: vision.position[0],
-      //   y: vision.position[1]
-      // })) < vision.magnitude + light.magnitude
-
       return distance(light.position, vision.position) < vision.magnitude + light.magnitude
     })
     .reduce(updateLightmap, map)

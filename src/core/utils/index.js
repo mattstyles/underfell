@@ -27,7 +27,22 @@ export class Rect {
       point[1] >= this.p1[1] &&
       point[1] <= this.p2[1]
   }
+
+  /**
+   * Checks for overlaps between rects
+   */
+  overlaps (rect) {
+    return this.containsPoint([rect.p1[0], rect.p1[1]]) ||
+      this.containsPoint([rect.p2[0], rect.p2[1]]) ||
+      this.containsPoint([rect.p2[0], rect.p1[1]]) ||
+      this.containsPoint([rect.p1[0], rect.p2[1]])
+  }
+
+  inspect () {
+    return [this.p1[0], this.p1[1], this.p2[0], this.p2[1]]
+  }
 }
+window.Rect = Rect
 
 /**
  * Distance helper for two points
