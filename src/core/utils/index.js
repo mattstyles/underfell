@@ -56,3 +56,8 @@ export const distance = (p1, p2) => {
     y: p2[1]
   }))
 }
+
+/**
+ * noop
+ */
+export function noop () {}

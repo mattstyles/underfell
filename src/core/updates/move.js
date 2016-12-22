@@ -8,6 +8,7 @@ import {
   clearVisibility,
   updateLights
 } from 'core/updates/visibility'
+import monit from 'components/monit/monit'
 
 /**
  * Game running direction/movement key handler
@@ -36,6 +37,8 @@ signal.register((state, event) => {
     if (event.payload.key === '<right>') {
       char.position[0]++
     }
+
+    monit.time('moving')
 
     let light = {
       startAngle: 0,
@@ -75,6 +78,8 @@ signal.register((state, event) => {
     // How many dirty chunks?
     // console.log('dirty', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.DIRTY))
     // console.log('transient', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.TRANSIENT))
+
+    monit.timeEnd('moving')
 
     return state
   }
