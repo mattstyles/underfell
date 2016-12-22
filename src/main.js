@@ -24,3 +24,8 @@ signal.observe(state => {
   console.error('signal error')
   console.error(error)
 })
+
+// Add debug info
+if (window.localStorage.getItem('DEBUG')) {
+  document.body.classList.add('debug')
+}

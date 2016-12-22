@@ -55,6 +55,7 @@ const render = (mat, translate) => {
  * to cells within the chunk, this is not removed from code awaiting testing.
  */
 const Chunk = ({mat, translate}) => {
+  // console.log(translate)
   return (
     <div className='Chunk' style={{
       width: SIZES.CHUNK_WIDTH * SIZES.CELL_WIDTH,
@@ -72,9 +73,14 @@ const Chunk = ({mat, translate}) => {
  * recalculate the DOM. As we are potentially rendering a large number of nodes
  * per map this chunking helps to reduce draw calls to only chunks that have
  * actually changed.
+ * @TODO removing dirty checking for now as we've now got viewport culling this
+ * limits the overdraw. Still slow for very large viewports though, could be
+ * fixed by reintroducing dirty checking and performing the translations inside
+ * another element.
  */
 const shouldChunkUpdate = (node, last, next, a) => {
-  return next.isDirty !== CHUNK_STATES.CLEAN
+  // return next.isDirty !== CHUNK_STATES.CLEAN
+  return true
 }
 
 /**
@@ -87,6 +93,8 @@ const Map = ({map, entities}) => {
   let char = entities[0]
   let v = getViewport(mat, ...char.position)
 
+  // console.log(v.inspect())
+
   // Use the viewport to filter non-visible chunks and map into Chunk
   // components.
   // @TODO remove overdraw. Currently if any cell of a chunk is visible then we
@@ -97,7 +105,7 @@ const Map = ({map, entities}) => {
         chunk.translate[0] + SIZES.CHUNK_WIDTH,
         chunk.translate[1] + SIZES.CHUNK_HEIGHT
       ])
-      return chunkRect.overlaps(v)
+      return v.overlaps(chunkRect)
     })
     .map((chunk, i) => {
       // Translate against the current viewport
@@ -114,6 +122,9 @@ const Map = ({map, entities}) => {
         chunk.translate[0] + SIZES.CHUNK_WIDTH,
         chunk.translate[1] + SIZES.CHUNK_HEIGHT
       ]
+
+      // console.log(i, `[${chunk.translate[0]}, ${chunk.translate[1]}]`,
+      //   `[${translate[0]}, ${translate[1]}]`)
 
       return (
         <Chunk
