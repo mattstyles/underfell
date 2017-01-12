@@ -83,6 +83,8 @@
   "dependencies": {
     "axios": "^0.15.3",
     "bezier-easing": "^2.0.3",
+    "bresenham": "0.0.4",
+    "bresenham-line": "^2.0.0",
     "classnames": "^2.2.5",
     "eventemitter3": "^2.0.2",
     "fast-simplex-noise": "^3.2.0",
@@ -90,7 +92,7 @@
     "inferno-component": "^0.7.26",
     "inferno-dom": "^0.7.26",
     "lodash": "^4.17.2",
-    "mathutil": "^0.2.0",
+    "mathutil": "^2.0.0",
     "most": "^1.1.1",
     "ndarray": "^1.0.18",
     "normalize.css": "^5.0.0",

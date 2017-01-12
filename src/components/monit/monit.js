@@ -77,36 +77,21 @@ class Monit {
     if (monitor) {
       monitor.time = window.performance.now() - monitor.start
       this.render()
+      console.log(`${monitor.id} ${monitor.time.toFixed(2)}ms`)
     }
   }
 
   render = () => {
-    console.log(this)
     render(<Component monitors={this.monitors} />, this.el)
   }
 }
 
 const create = () => {
   if (!window.localStorage.getItem('MONIT')) {
-    console.log('abstract')
     return abstract
   }
 
-  // var el = document.createElement('div')
-  // Object.assign(el.style, {
-  //   ...stylesheet.main
-  // })
-  // document.body.appendChild(el)
-  //
-  // signal.observe(state => {
-  //   console.log('render monit')
-  //   render(<Monit state={state} />, el)
-  // }, error => {
-  //   console.error(error)
-  // })
-  let monit = new Monit()
-
-  return monit
+  return new Monit()
 }
 
 export default create()

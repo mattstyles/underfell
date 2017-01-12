@@ -1,11 +1,11 @@
 
 import BezierEasing from 'bezier-easing'
 import ndarray from 'ndarray'
-import {Vector2, Ray} from 'mathutil'
+import {Vector2} from 'mathutil'
 
 import {ndIterate} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
-// import {getChunk, makeDirty, makeClean} from 'core/models/chunks'
+import {getChunk, makeDirty, makeClean} from 'core/models/chunks'
 import {distance} from 'core/utils'
 
 const easing = BezierEasing(0, 0, 0, 1)
@@ -18,7 +18,7 @@ export const clearVisibility = map => {
   ndIterate(mat, (mat, x, y) => {
     makeCellInvisible(mat.get(x, y))
   })
-  // map.chunks.forEach(makeClean)
+  map.chunks.forEach(makeClean)
   return map
 }
 
@@ -102,7 +102,6 @@ const get = (mat, x, y) => {
 /**
  * Takes a ray and projects it forward, executing the callback as it goes.
  * It'll bail if it hits a solid block, firing the callback on the way out.
- * @deprecated in favour of using Ray.cast and generators
  */
 const castRay = (mat, ray, light, cb) => {
   // Check for 0 length ray which would create an infinite while
@@ -143,23 +142,15 @@ const castRay = (mat, ray, light, cb) => {
 /**
  * Flags a chunk as dirty, used when a cell changes to flag to the renderer to
  * redraw this chunk.
- * @deprecated causing big lag spikes for some reason, getChunk uses find??
- * the issue here is that each cell calls a find on the chunk array, which gets
- * slower when querying chunks at the bottom of the list and sometimes gets
- * super slow. maybe if the chunk array was divided into x, y as those values
- * can be calculated from cell [x, y] and chunk dimensions rather than a linear
- * find operation being spammed.
  */
 const updateChunk = (chunks, x, y) => {
-  return
-
-  // let chunk = getChunk(chunks, x, y)
-  // if (!chunk) {
-  //   console.warn('no chunk found', x, y)
-  //   return chunks
-  // }
-  // makeDirty(chunk)
-  // return chunks
+  let chunk = getChunk(chunks, x, y)
+  if (!chunk) {
+    console.warn('no chunk found', x, y)
+    return chunks
+  }
+  makeDirty(chunk)
+  return chunks
 }
 
 /**
@@ -167,41 +158,22 @@ const updateChunk = (chunks, x, y) => {
  */
 export const updateVisibility = (map, char) => {
   let mat = ndarray(map.data, [map.width, map.height])
+  let ray = new Vector2(1, 0)
 
   for (
     let angle = char.startAngle;
     angle < char.endAngle;
     angle += VISIBILITY.RAY_ANGLE_INC
   ) {
-    // castRay(
-    //   mat,
-    //   ray.rotate(angle),
-    //   char,
-    //   (cell, lum, u, v) => {
-    //     makeCellVisible(cell)
-    //     updateChunk(map.chunks, u, v)
-    //   }
-    // )
-    let dir = Vector2.fromAngle(angle)
-    let ray = new Ray(dir)
-    let cast = ray.cast({
-      origin: [char.position[0] + 0.5, char.position[1] + 0.5],
-      magnitude: 10,
-      step: 1
-    })
-
-    // Turn into a while loop and terminate either at a blocker
-    // or when the ray reaches its angle, i.e. next === false
-    for (let p of cast()) {
-      let cell = get(mat, p[0] | 0, p[1] | 0)
-      if (cell) {
-        // Dummy all light cells to 1, @TODO update lighting calcs
-        cell.light = 1
-
+    castRay(
+      mat,
+      ray.rotate(angle),
+      char,
+      (cell, lum, u, v) => {
         makeCellVisible(cell)
-        updateChunk(map.chunks, p[0] | 0, p[1] | 0)
+        updateChunk(map.chunks, u, v)
       }
-    }
+    )
   }
 
   // As ray starts at a length of 1 everything inside that region is invisible
@@ -250,8 +222,7 @@ const updateLightmap = (map, light) => {
     }
 
     // Update the chunk dirty flag
-    // No longer using chunks, this function caused huge lag spikes
-    // updateChunk(map.chunks, x, y)
+    updateChunk(map.chunks, x, y)
   }
 
   for (
@@ -294,86 +265,4 @@ export const updateLights = (map, lights, vision) => {
       return distance(light.position, vision.position) < vision.magnitude + light.magnitude
     })
     .reduce(updateLightmap, map)
-}
-
-export const rayman = (map, pos) => {
-  let mat = ndarray(map.data, [map.width, map.height])
-
-  // Set standing tile visible
-  let cell = get(mat, ...pos)
-  if (cell) {
-    cell.light = 1
-    makeCellVisible(cell)
-    updateChunk(map.chunks, ...pos)
-  }
-
-  for (let a = 0; a < Math.PI * 2; a += VISIBILITY.RAY_ANGLE_INC) {
-    let d = Vector2.fromAngle(a)
-    let ray = new Ray(d)
-    let cast = ray.project({
-      origin: [pos[0] + 0.5, pos[1] + 0.5],
-      magnitude: 6,
-      step: 1
-    })
-
-    cast(vec => {
-      let p = vec.position()
-      let cell = get(mat, p[0] | 0, p[1] | 0)
-      if (cell) {
-        cell.light = 1
-        makeCellVisible(cell)
-        // updateChunk(map.chunks, p[0] | 0, p[1] | 0)
-      }
-    })
-
-    // let cast = ray.cast({
-    //   origin: [pos[0] + 0.5, pos[1] + 0.5],
-    //   magnitude: 6,
-    //   step: 1
-    // })
-
-    // Using the generator
-    // for (let p of cast()) {
-    //   let cell = get(mat, p[0] | 0, p[1] | 0)
-    //   if (cell) {
-    //     cell.light = 1
-    //     makeCellVisible(cell)
-    //     // updateChunk(map.chunks, p[0] | 0, p[1] | 0)
-    //   }
-    // }
-  }
-
-  // let dir = Vector2.fromAngle(0)
-  // let ray = new Ray(dir)
-  // let cast = ray.cast({
-  //   origin: [pos[0] + 0.5, pos[1] + 0.5],
-  //   magnitude: 6,
-  //   step: 1
-  // })
-  //
-  // for (let p of cast()) {
-  //   let cell = get(mat, p[0] | 0, p[1] | 0)
-  //   if (cell) {
-  //     cell.light = 1
-  //     makeCellVisible(cell)
-  //     updateChunk(map.chunks, p[0] | 0, p[1] | 0)
-  //   }
-  // }
-  //
-  // ray = new Ray(Vector2.fromAngle(Math.PI))
-  // cast = ray.cast({
-  //   origin: [pos[0] + 0.5, pos[1] + 0.5],
-  //   magnitude: 6,
-  //   step: 1
-  // })
-  // for (let p of cast()) {
-  //   let cell = get(mat, p[0] | 0, p[1] | 0)
-  //   if (cell) {
-  //     cell.light = 1
-  //     makeCellVisible(cell)
-  //     updateChunk(map.chunks, p[0] | 0, p[1] | 0)
-  //   }
-  // }
-
-  return map
 }

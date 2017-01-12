@@ -34,6 +34,10 @@ export const makeClean = chunk => {
 
 /**
  * Returns the chunk containing [x, y] from an array of chunks
+ * @TODO this function can get super slow. The chunk array needs to be better
+ * structured into [x, y] so that, given a cell [x, y], the algorithm can just
+ * use array lookup to turn cell [x, y] into a chunk [x, y] rather than
+ * creating Rect objects and performing the linear search (find)
  */
 export const getChunk = (chunks, x, y) => {
   return chunks.find(chunk => {

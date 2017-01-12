@@ -22,8 +22,8 @@ export const SIZES = {
   CELL_HEIGHT: 16,
   VIEWPORT_WIDTH: 64,
   VIEWPORT_HEIGHT: 32,
-  MAP_WIDTH: 128,
-  MAP_HEIGHT: 64,
+  MAP_WIDTH: 512,
+  MAP_HEIGHT: 256,
   CHUNK_WIDTH: 16,
   CHUNK_HEIGHT: 8
 }
@@ -40,5 +40,5 @@ export const VISIBILITY = {
 
   // Defines how many rays to cast, i.e. 1 degree = 360 rays, more work but
   // greater accuracy
-  RAY_ANGLE_INC: Math.PI / 180
+  RAY_ANGLE_INC: Math.PI / 360
 }

@@ -11,7 +11,7 @@ export const signal = new Signal({
   entities: [
     {
       id: 'char',
-      position: [11, 3]
+      position: [414, 200]
     }
   ],
   map: generate(SIZES.MAP_WIDTH, SIZES.MAP_HEIGHT)

@@ -67,16 +67,17 @@ signal.register((state, event) => {
     state.map = clearVisibility(state.map)
 
     // Update the light map
-    state.map = updateLights(state.map, [
-      light,
-      dummyLight
-    ], vision)
+    // state.map = updateLights(state.map, [
+    //   light,
+    //   dummyLight
+    // ], vision)
 
     // Update the visibility map
     state.map = updateVisibility(state.map, vision)
 
     // How many dirty chunks?
-    // console.log('dirty', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.DIRTY))
+    // console.log('dirty', state.map.chunks
+    //   .filter(chunk => chunk.state === CHUNK_STATES.DIRTY))
     // console.log('transient', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.TRANSIENT))
 
     monit.timeEnd('moving')
