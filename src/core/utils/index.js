@@ -42,19 +42,12 @@ export class Rect {
     return [this.p1[0], this.p1[1], this.p2[0], this.p2[1]]
   }
 }
-window.Rect = Rect
 
 /**
  * Distance helper for two points
  */
 export const distance = (p1, p2) => {
-  return Math.abs(euclidean({
-    x: p1[0],
-    y: p1[1]
-  }, {
-    x: p2[0],
-    y: p2[1]
-  }))
+  return Math.abs(euclidean(p1, p2))
 }
 
 /**

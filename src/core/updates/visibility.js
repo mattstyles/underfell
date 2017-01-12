@@ -173,21 +173,15 @@ export const updateVisibility = (map, char) => {
     angle < char.endAngle;
     angle += VISIBILITY.RAY_ANGLE_INC
   ) {
-    // castRay(
-    //   mat,
-    //   ray.rotate(angle),
-    //   char,
-    //   (cell, lum, u, v) => {
-    //     makeCellVisible(cell)
-    //     updateChunk(map.chunks, u, v)
-    //   }
-    // )
     let dir = Vector2.fromAngle(angle)
     let ray = new Ray(dir)
     let cast = ray.cast({
-      origin: [char.position[0] + 0.5, char.position[1] + 0.5],
-      magnitude: 10,
-      step: 1
+      origin: [
+        char.position[0] + VISIBILITY.ORIGIN_OFFSET,
+        char.position[1] + VISIBILITY.ORIGIN_OFFSET
+      ],
+      magnitude: char.magnitude,
+      step: VISIBILITY.RAY_MAG_INC
     })
 
     // Turn into a while loop and terminate either at a blocker
@@ -196,7 +190,7 @@ export const updateVisibility = (map, char) => {
       let cell = get(mat, p[0] | 0, p[1] | 0)
       if (cell) {
         // Dummy all light cells to 1, @TODO update lighting calcs
-        cell.light = 1
+        // cell.light = 1
 
         makeCellVisible(cell)
         updateChunk(map.chunks, p[0] | 0, p[1] | 0)
@@ -217,9 +211,7 @@ export const updateVisibility = (map, char) => {
  */
 const updateLightmap = (map, light) => {
   let mat = ndarray(map.data, [map.width, map.height])
-  let ray = new Vector2(1, 0)
 
-  // Keep track of cells we have already visited and only add light once
   let closed = []
 
   // Updates the cell with light calculation
@@ -239,6 +231,8 @@ const updateLightmap = (map, light) => {
     // a colour, the renderer would then perform the blend.
     // @TODO this 0.25 could be extracted to a global, or ambient, light
     // level for all blocks.
+    // @TODO just use clamp e.g. clamp(easing(lumination), 0.25, 1)
+    // @TODO calculate lumination as it wont be passed to this function
     let l = 0.25 + (easing(lumination) * 0.75)
 
     // Use light addition so that multiple light sources stack
@@ -251,7 +245,7 @@ const updateLightmap = (map, light) => {
 
     // Update the chunk dirty flag
     // No longer using chunks, this function caused huge lag spikes
-    // updateChunk(map.chunks, x, y)
+    updateChunk(map.chunks, x, y)
   }
 
   for (
@@ -259,12 +253,29 @@ const updateLightmap = (map, light) => {
     angle < light.endAngle;
     angle += VISIBILITY.RAY_ANGLE_INC
   ) {
-    castRay(
-      mat,
-      ray.rotate(angle),
-      light,
-      updateCellLight
-    )
+    let dir = Vector2.fromAngle(angle)
+    let ray = new Ray(dir)
+    let cast = ray.cast({
+      origin: [
+        light.position[0] + VISIBILITY.ORIGIN_OFFSET,
+        light.position[1] + VISIBILITY.ORIGIN_OFFSET
+      ],
+      magnitude: light.magnitude,
+      step: VISIBILITY.RAY_MAG_INC
+    })
+
+    // Turn into a while loop and terminate either at a blocker
+    // or when the ray reaches its angle, i.e. next === false
+    for (let p of cast()) {
+      let cell = get(mat, p[0] | 0, p[1] | 0)
+      if (cell) {
+        // @TODO update lighting calcs
+        cell.light = 1
+
+       //  makeCellVisible(cell)
+       //  updateChunk(map.chunks, p[0] | 0, p[1] | 0)
+      }
+    }
   }
 
   // Update light source block to be fully lighted
@@ -275,6 +286,67 @@ const updateLightmap = (map, light) => {
 
   return map
 }
+
+// const updateLightmap = (map, light) => {
+//   let mat = ndarray(map.data, [map.width, map.height])
+//   let ray = new Vector2(1, 0)
+//
+//   // Keep track of cells we have already visited and only add light once
+//   let closed = []
+//
+//   // Updates the cell with light calculation
+//   const updateCellLight = (cell, lumination, x, y) => {
+//     // If we have already visited this cell then we're good to skip it,
+//     // another light source could visit and up the light level though.
+//     if (closed.find(cell => cell[0] === x && cell[1] === y)) {
+//       return
+//     }
+//
+//     closed.push([x, y])
+//
+//     // Clamp luminosity 0.25...1.
+//     // Apply easing to the luminosity to create a better light falloff.
+//     // @TODO light describes block opacity currently but better could be
+//     // to have coloured lights so cell.light would become a magnitude and
+//     // a colour, the renderer would then perform the blend.
+//     // @TODO this 0.25 could be extracted to a global, or ambient, light
+//     // level for all blocks.
+//     let l = 0.25 + (easing(lumination) * 0.75)
+//
+//     // Use light addition so that multiple light sources stack
+//     cell.light += l
+//
+//     // Clamp saturation to 1
+//     if (cell.light > 1) {
+//       cell.light = 1
+//     }
+//
+//     // Update the chunk dirty flag
+//     // No longer using chunks, this function caused huge lag spikes
+//     // updateChunk(map.chunks, x, y)
+//   }
+//
+//   for (
+//     let angle = light.startAngle;
+//     angle < light.endAngle;
+//     angle += VISIBILITY.RAY_ANGLE_INC
+//   ) {
+//     castRay(
+//       mat,
+//       ray.rotate(angle),
+//       light,
+//       updateCellLight
+//     )
+//   }
+//
+//   // Update light source block to be fully lighted
+//   let source = get(mat, ...light.position)
+//   if (source) {
+//     source.light = 1
+//   }
+//
+//   return map
+// }
 
 /**
  * Work the matrix through all light sources, applying light transforms as

@@ -67,10 +67,10 @@ signal.register((state, event) => {
     state.map = clearVisibility(state.map)
 
     // Update the light map
-    // state.map = updateLights(state.map, [
-    //   light,
-    //   dummyLight
-    // ], vision)
+    state.map = updateLights(state.map, [
+      light,
+      dummyLight
+    ], vision)
 
     // Update the visibility map
     state.map = updateVisibility(state.map, vision)
