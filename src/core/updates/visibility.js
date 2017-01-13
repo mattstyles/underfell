@@ -1,7 +1,7 @@
 
 import BezierEasing from 'bezier-easing'
 import ndarray from 'ndarray'
-import {Vector2, Ray} from 'mathutil'
+import {Vector2, Ray, clamp} from 'mathutil'
 
 import {ndIterate} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
@@ -212,40 +212,53 @@ export const updateVisibility = (map, char) => {
 const updateLightmap = (map, light) => {
   let mat = ndarray(map.data, [map.width, map.height])
 
+  // Tracks currently visited cells to ensure this light visits its cells
+  // only once. This drastically cuts down the number of checks and allows
+  // lighting to work far more easily.
   let closed = []
 
-  // Updates the cell with light calculation
-  const updateCellLight = (cell, lumination, x, y) => {
-    // If we have already visited this cell then we're good to skip it,
-    // another light source could visit and up the light level though.
-    if (closed.find(cell => cell[0] === x && cell[1] === y)) {
-      return
+  // Clamp luminosity 0.25...1.
+  // Apply easing to the luminosity to create a better light falloff.
+  // @TODO light describes block opacity currently but better could be
+  // to have coloured lights so cell.light would become a magnitude and
+  // a colour, the renderer would then perform the blend.
+  // @TODO this 0.25 could be extracted to a global, or ambient, light
+  // level for all blocks.
+  function getLuminance (point) {
+    let pos = [
+      light.position[0] + VISIBILITY.ORIGIN_OFFSET,
+      light.position[1] + VISIBILITY.ORIGIN_OFFSET
+    ]
+    let d = 1 - (distance(point, pos) / light.magnitude)
+    return clamp(easing(d), 0.25, 1)
+  }
+
+  // Adds a light level to the cell referred to by point
+  function updateCellLight (point) {
+    let x = point[0] | 0
+    let y = point[1] | 0
+    let cell = get(mat, x, y)
+
+    if (!cell) {
+      return false
     }
 
+    // Use a for loop as .find is slow
+    // Bail if this light has already visited this cell
+    for (let i = 0; i < closed.length; i++) {
+      let pt = closed[i]
+      if (pt[0] === x && pt[1] === y) {
+        return false
+      }
+    }
     closed.push([x, y])
 
-    // Clamp luminosity 0.25...1.
-    // Apply easing to the luminosity to create a better light falloff.
-    // @TODO light describes block opacity currently but better could be
-    // to have coloured lights so cell.light would become a magnitude and
-    // a colour, the renderer would then perform the blend.
-    // @TODO this 0.25 could be extracted to a global, or ambient, light
-    // level for all blocks.
-    // @TODO just use clamp e.g. clamp(easing(lumination), 0.25, 1)
-    // @TODO calculate lumination as it wont be passed to this function
-    let l = 0.25 + (easing(lumination) * 0.75)
-
-    // Use light addition so that multiple light sources stack
+    let l = getLuminance(point)
     cell.light += l
 
-    // Clamp saturation to 1
-    if (cell.light > 1) {
-      cell.light = 1
-    }
-
-    // Update the chunk dirty flag
-    // No longer using chunks, this function caused huge lag spikes
-    updateChunk(map.chunks, x, y)
+    //  makeCellVisible(cell)
+    //  updateChunk(map.chunks, p[0] | 0, p[1] | 0)
+    return true
   }
 
   for (
@@ -267,20 +280,14 @@ const updateLightmap = (map, light) => {
     // Turn into a while loop and terminate either at a blocker
     // or when the ray reaches its angle, i.e. next === false
     for (let p of cast()) {
-      let cell = get(mat, p[0] | 0, p[1] | 0)
-      if (cell) {
-        // @TODO update lighting calcs
-        cell.light = 1
-
-       //  makeCellVisible(cell)
-       //  updateChunk(map.chunks, p[0] | 0, p[1] | 0)
-      }
+      updateCellLight(p)
     }
   }
 
   // Update light source block to be fully lighted
   let source = get(mat, ...light.position)
   if (source) {
+    console.log(source)
     source.light = 1
   }
 
