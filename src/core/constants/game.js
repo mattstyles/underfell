@@ -40,5 +40,5 @@ export const VISIBILITY = {
 
   // Defines how many rays to cast, i.e. 1 degree = 360 rays, more work but
   // greater accuracy
-  RAY_ANGLE_INC: Math.PI / 360
+  RAY_ANGLE_INC: Math.PI / 180
 }

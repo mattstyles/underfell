@@ -40,24 +40,39 @@ signal.register((state, event) => {
 
     monit.time('moving')
 
-    let light = {
-      startAngle: 0,
-      endAngle: Math.PI * 2,
-      magnitude: 5,
-      position: char.position
-    }
-
-    let dummyLight = {
-      startAngle: Math.PI * -0.5,
-      endAngle: Math.PI * 0.5,
-      magnitude: 2,
-      position: [0, 1]
-    }
+    var lights = [
+      // Char light
+      {
+        startAngle: 0,
+        endAngle: Math.PI * 2,
+        magnitude: 6,
+        position: char.position
+      },
+      // Wall lights
+      {
+        startAngle: Math.PI * -0.5,
+        endAngle: Math.PI * 0.5,
+        magnitude: 2,
+        position: [0, 1]
+      },
+      {
+        startAngle: Math.PI * -2,
+        endAngle: Math.PI,
+        magnitude: 3,
+        position: [15, 0]
+      },
+      {
+        startAngle: Math.PI * 0.5,
+        endAngle: Math.PI * 1.5,
+        magnitude: 3,
+        position: [17, 10]
+      }
+    ]
 
     let vision = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 10,
+      magnitude: 20,
       position: char.position
     }
 
@@ -67,10 +82,7 @@ signal.register((state, event) => {
     state.map = clearVisibility(state.map)
 
     // Update the light map
-    state.map = updateLights(state.map, [
-      light,
-      dummyLight
-    ], vision)
+    state.map = updateLights(state.map, lights, vision)
 
     // Update the visibility map
     state.map = updateVisibility(state.map, vision)
