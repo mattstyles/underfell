@@ -1,4 +1,5 @@
 
+import {compose} from 'lodash/fp'
 import {signal} from 'signals/main'
 import {ACTIONS} from 'core/constants/actions'
 import {GAME_STATES, CHUNK_STATES} from 'core/constants/game'
@@ -50,10 +51,10 @@ signal.register((state, event) => {
       },
       // Wall lights
       {
-        startAngle: Math.PI * -0.5,
-        endAngle: Math.PI * 0.5,
+        startAngle: 0,
+        endAngle: Math.PI * 2,
         magnitude: 2,
-        position: [0, 1]
+        position: [2, 2]
       },
       {
         startAngle: Math.PI * -2,
@@ -78,19 +79,12 @@ signal.register((state, event) => {
 
     // @TODO use viewport to clamp cell updates
 
-    // Clear the visibility and light data from the map
-    state.map = clearVisibility(state.map)
-
-    // Update the light map
-    state.map = updateLights(state.map, lights, vision)
-
-    // Update the visibility map
-    state.map = updateVisibility(state.map, vision)
-
-    // How many dirty chunks?
-    // console.log('dirty', state.map.chunks
-    //   .filter(chunk => chunk.state === CHUNK_STATES.DIRTY))
-    // console.log('transient', state.map.chunks.filter(chunk => chunk.state === CHUNK_STATES.TRANSIENT))
+    // Update light and visibility map
+    state.map = compose(
+      updateVisibility(vision),
+      updateLights(lights, vision),
+      clearVisibility
+    )(state.map)
 
     monit.timeEnd('moving')
 

@@ -19,10 +19,10 @@ const App = ({state}) => {
 let main = document.querySelector('.js-main')
 
 signal.observe(state => {
-  console.time('render')
+  // console.time('render')
   monit.time('render')
   render(<App state={state} />, main)
-  console.timeEnd('render')
+  // console.timeEnd('render')
   monit.timeEnd('render')
 }, error => {
   console.error('signal error')

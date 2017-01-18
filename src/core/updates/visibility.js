@@ -167,22 +167,22 @@ const updateChunk = (chunks, x, y) => {
 /**
  * Feed me a light source and a matrix and I'll light that matrix right up!
  */
-export const updateVisibility = (map, char) => {
+export const updateVisibility = vision => map => {
   let mat = ndarray(map.data, [map.width, map.height])
 
   for (
-    let angle = char.startAngle;
-    angle < char.endAngle;
+    let angle = vision.startAngle;
+    angle < vision.endAngle;
     angle += VISIBILITY.RAY_ANGLE_INC
   ) {
     let dir = Vector2.fromAngle(angle)
     let ray = new Ray(dir)
     let cast = ray.cast({
       origin: [
-        char.position[0] + VISIBILITY.ORIGIN_OFFSET,
-        char.position[1] + VISIBILITY.ORIGIN_OFFSET
+        vision.position[0] + VISIBILITY.ORIGIN_OFFSET,
+        vision.position[1] + VISIBILITY.ORIGIN_OFFSET
       ],
-      magnitude: char.magnitude,
+      magnitude: vision.magnitude,
       step: VISIBILITY.RAY_MAG_INC
     })()
 
@@ -220,7 +220,7 @@ export const updateVisibility = (map, char) => {
   // As ray starts at a length of 1 everything inside that region is invisible
   // to the cast. As unit 1 references a discrete cell in our matrix we can just
   // update the light position cell and continue unabated.
-  updateCellVisibility(mat, ...char.position)
+  updateCellVisibility(mat, ...vision.position)
 
   return map
 }
@@ -337,7 +337,7 @@ const updateLightmap = (map, light) => {
  * This would up the complexity though as each block would have to check its
  * light sources to get the correct light level when there is a lighting change.
  */
-export const updateLights = (map, lights, vision) => {
+export const updateLights = (lights, vision) => map => {
   return lights
     .filter(light => {
       // Remove lights too far from vision

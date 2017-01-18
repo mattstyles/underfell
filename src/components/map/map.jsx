@@ -151,6 +151,7 @@ const Map = ({map, entities}) => {
       <Entities
         entities={entities}
         translate={[-v.p1[0], -v.p1[1]]}
+        map={map}
       />
     </div>
   )

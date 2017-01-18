@@ -1,39 +1,22 @@
 
-import {SIZES} from 'core/constants/game'
+import ndarray from 'ndarray'
+import {BLOCK_STATES, SIZES} from 'core/constants/game'
 
-const entityMapper = {
-  'char': {
-    color: 'rgb(218, 212, 94)',
-    gfx: '@'
-  },
-  'def': {
-    color: '#888',
-    gfx: '~'
-  }
-}
-
-const getEntity = id => {
-  let entity = entityMapper[id]
-  return entity || entityMapper['def']
-}
-
-const Entities = ({entities, translate}) => {
+const Entities = ({entities, map, translate}) => {
+  let mat = ndarray(map.data, [map.width, map.height])
   let e = entities
-    .map(entity => Object.assign(getEntity(entity.id), {
-      position: [
-        entity.position[0] + translate[0],
-        entity.position[1] + translate[1]
-      ]
-    }))
     .filter(entity => {
-      // @TODO only render those entities with visibility
-      return true
+      // To save calling mat.get twice we'll mutate here too, naughty
+      let cell = mat.get(...entity.position)
+      entity.light = cell.light
+      return cell.state === BLOCK_STATES.VISIBLE
     })
     .map((entity, i) => {
       let style = {
         color: entity.color,
         left: entity.position[0] * SIZES.CELL_WIDTH,
-        top: entity.position[1] * SIZES.CELL_HEIGHT
+        top: entity.position[1] * SIZES.CELL_HEIGHT,
+        opacity: entity.light
       }
       return (
         <span
@@ -41,7 +24,7 @@ const Entities = ({entities, translate}) => {
           className='Entity'
           style={style}
         >
-          {entity.gfx}
+          {entity.char}
         </span>
       )
     })
