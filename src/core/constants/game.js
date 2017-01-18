@@ -17,11 +17,12 @@ export const CHUNK_STATES = keyMirror('CHUNK_STATE', [
   'DIRTY'
 ])
 
+// font-size 14px, [9, 16]
 export const SIZES = {
-  CELL_WIDTH: 9,
-  CELL_HEIGHT: 16,
-  VIEWPORT_WIDTH: 64,
-  VIEWPORT_HEIGHT: 32,
+  CELL_WIDTH: 11,
+  CELL_HEIGHT: 17,
+  VIEWPORT_WIDTH: 48,
+  VIEWPORT_HEIGHT: 24,
   MAP_WIDTH: 128,
   MAP_HEIGHT: 64,
   CHUNK_WIDTH: 16,
