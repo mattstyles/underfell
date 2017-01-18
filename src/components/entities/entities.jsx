@@ -17,7 +17,8 @@ const Entities = ({entities, map, translate}) => {
         color: entity.color,
         left: (entity.position[0] + translate[0]) * SIZES.CELL_WIDTH,
         top: (entity.position[1] + translate[1]) * SIZES.CELL_HEIGHT,
-        opacity: entity.light
+        opacity: entity.light,
+        zIndex: entity.z || 100
       }
       return (
         <span

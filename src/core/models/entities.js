@@ -8,7 +8,8 @@ const entities = [
   {
     id: 'char',
     char: '@',
-    color: 'rgb(218, 212, 94)'
+    color: 'rgb(218, 212, 94)',
+    z: 120
   },
   {
     id: 'light',
