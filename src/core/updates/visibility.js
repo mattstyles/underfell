@@ -3,7 +3,7 @@ import BezierEasing from 'bezier-easing'
 import ndarray from 'ndarray'
 import {Vector2, Ray, clamp} from 'mathutil'
 
-import {ndIterate} from 'core/utils/ndarray'
+import {ndIterate, checkBounds} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
 // import {getChunk, makeDirty, makeClean} from 'core/models/chunks'
 import {distance} from 'core/utils'
@@ -45,21 +45,6 @@ const makeCellInvisible = cell => {
 }
 
 /**
- * Straight forward matrix bounds checker to stop access errors
- */
-const checkBounds = (mat, x, y) => {
-  if (x < 0 || y < 0) {
-    return false
-  }
-
-  if (x >= mat.shape[0] || y >= mat.shape[1]) {
-    return false
-  }
-
-  return true
-}
-
-/**
  * Returns if the current cell found at [x, y] blocks vision
  * @returns Boolean
  */
@@ -74,7 +59,7 @@ const isBlocker = (mat, x, y) => {
     return false
   }
 
-  return cell.isSolid
+  return cell.isOpaque
 }
 
 /**
@@ -140,6 +125,36 @@ const get = (mat, x, y) => {
 //   }
 // }
 
+const castRay = options => cb => {
+  for (
+    let angle = options.startAngle;
+    angle < options.endAngle;
+    angle += VISIBILITY.RAY_ANGLE_INC
+  ) {
+    let dir = Vector2.fromAngle(angle)
+    let ray = new Ray(dir)
+    let cast = ray.cast({
+      origin: [
+        options.position[0] + VISIBILITY.ORIGIN_OFFSET,
+        options.position[1] + VISIBILITY.ORIGIN_OFFSET
+      ],
+      magnitude: options.magnitude,
+      step: VISIBILITY.RAY_MAG_INC
+    })()
+
+    let p = cast.next()
+    while (!p.done) {
+      // Return integer values to callback
+      let result = cb([p.value[0] | 0, p.value[1] | 0])
+      if (!result) {
+        break
+      }
+
+      p = cast.next()
+    }
+  }
+}
+
 /**
  * Flags a chunk as dirty, used when a cell changes to flag to the renderer to
  * redraw this chunk.
@@ -165,57 +180,26 @@ const updateChunk = (chunks, x, y) => {
 }
 
 /**
- * Feed me a light source and a matrix and I'll light that matrix right up!
+ * Give me a vision and I'll set blocks to be visible
  */
 export const updateVisibility = vision => map => {
   let mat = ndarray(map.data, [map.width, map.height])
 
-  for (
-    let angle = vision.startAngle;
-    angle < vision.endAngle;
-    angle += VISIBILITY.RAY_ANGLE_INC
-  ) {
-    let dir = Vector2.fromAngle(angle)
-    let ray = new Ray(dir)
-    let cast = ray.cast({
-      origin: [
-        vision.position[0] + VISIBILITY.ORIGIN_OFFSET,
-        vision.position[1] + VISIBILITY.ORIGIN_OFFSET
-      ],
-      magnitude: vision.magnitude,
-      step: VISIBILITY.RAY_MAG_INC
-    })()
+  castRay(vision)(point => {
+    let [u, v] = point
+    let cell = get(mat, u, v)
 
-    // Turn into a while loop and terminate either at a blocker
-    // or when the ray reaches its angle, i.e. next === false
-    // for (let p of cast()) {
-    //   let cell = get(mat, p[0] | 0, p[1] | 0)
-    //   if (cell) {
-    //     // Dummy all light cells to 1, @TODO update lighting calcs
-    //     // cell.light = 1
-    //
-    //     makeCellVisible(cell)
-    //     updateChunk(map.chunks, p[0] | 0, p[1] | 0)
-    //   }
-    // }
-
-    let p = cast.next()
-    while (!p.done) {
-      let [u, v] = [p.value[0] | 0, p.value[1] | 0]
-      let cell = get(mat, u, v)
-
-      if (cell) {
-        makeCellVisible(cell)
-        updateChunk(map.chunks, u, v)
-      }
-
-      if (isBlocker(mat, u, v)) {
-        break
-      }
-
-      p = cast.next()
+    if (cell) {
+      makeCellVisible(cell)
+      updateChunk(map.chunks, u, v)
     }
-  }
+
+    if (isBlocker(mat, u, v)) {
+      return false
+    }
+
+    return true
+  })
 
   // As ray starts at a length of 1 everything inside that region is invisible
   // to the cast. As unit 1 references a discrete cell in our matrix we can just
@@ -226,7 +210,7 @@ export const updateVisibility = vision => map => {
 }
 
 /**
- * Feed me a light and I'll populate a light map
+ * Feed me a light source and a matrix and I'll light that matrix right up!
  */
 const updateLightmap = (map, light) => {
   let mat = ndarray(map.data, [map.width, map.height])
@@ -281,41 +265,17 @@ const updateLightmap = (map, light) => {
     return true
   }
 
-  for (
-    let angle = light.startAngle;
-    angle < light.endAngle;
-    angle += VISIBILITY.RAY_ANGLE_INC
-  ) {
-    let dir = Vector2.fromAngle(angle)
-    let ray = new Ray(dir)
-    let cast = ray.cast({
-      origin: [
-        light.position[0] + VISIBILITY.ORIGIN_OFFSET,
-        light.position[1] + VISIBILITY.ORIGIN_OFFSET
-      ],
-      magnitude: light.magnitude,
-      step: VISIBILITY.RAY_MAG_INC
-    })()
+  castRay(light)(point => {
+    let [u, v] = point
 
-    // Turn into a while loop and terminate either at a blocker
-    // or when the ray reaches its angle, i.e. next === false
-    // for (let p of cast()) {
-    //   updateCellLight(p)
-    // }
+    updateCellLight(u, v)
 
-    let p = cast.next()
-    while (!p.done) {
-      let [u, v] = [p.value[0] | 0, p.value[1] | 0]
-
-      updateCellLight(u, v)
-
-      if (isBlocker(mat, u, v)) {
-        break
-      }
-
-      p = cast.next()
+    if (isBlocker(mat, u, v)) {
+      return false
     }
-  }
+
+    return true
+  })
 
   // Update light source block to be fully lighted
   let source = get(mat, ...light.position)

@@ -21,3 +21,19 @@ export const ndMap = (mat, cb) => {
   })
   return mapped
 }
+
+/**
+ * Checks that a given point is in bounds
+ * @returns <Boolean>
+ */
+export const checkBounds = (mat, x, y) => {
+  if (x < 0 || y < 0) {
+    return false
+  }
+
+  if (x >= mat.shape[0] || y >= mat.shape[1]) {
+    return false
+  }
+
+  return true
+}

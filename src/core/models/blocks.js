@@ -6,17 +6,21 @@ import {BLOCK_STATES} from 'core/constants/game'
  * Master immutable block record list
  */
 const blocks = [
+  // Stone floor
   {
     id: 0,
     char: '.',
     color: 'rgb(68, 36, 52)',
-    isSolid: false
+    isSolid: false,
+    isOpaque: false
   },
+  // Stone block
   {
     id: 1,
     char: '#',
+    color: 'rgb(133, 149, 161)',
     isSolid: true,
-    color: 'rgb(133, 149, 161)'
+    isOpaque: true
   }
 ]
 
