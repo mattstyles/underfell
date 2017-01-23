@@ -50,3 +50,14 @@ fromEvent('keydown', quay.stream('*'))
       payload: event
     })
   })
+
+fromEvent('keydown', quay.stream('*'))
+  .observe(event => {
+    signal.emit({
+      type: ACTIONS.KEYDOWN,
+      payload: {
+        key: event.key,
+        allKeys: quay.pressed
+      }
+    })
+  })

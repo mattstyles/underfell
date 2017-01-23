@@ -29,7 +29,8 @@ const isBlocker = (mat, x, y) => {
   return cell.isSolid
 }
 
-const updateMove = map => {
+const updateMove = state => {
+  let {map} = state
   let mat = ndarray(map.data, [map.width, map.height])
 
   return (key, char) => {
@@ -73,7 +74,7 @@ signal.register((state, event) => {
   if (event.type === ACTIONS.DIRKEYDOWN) {
     let char = getById(state.entities, 'char')
 
-    if (!updateMove(state.map)(event.payload.key, char)) {
+    if (!updateMove(state)(event.payload.key, char)) {
       return state
     }
 
@@ -111,7 +112,7 @@ signal.register((state, event) => {
     let vision = {
       startAngle: 0,
       endAngle: Math.PI * 2,
-      magnitude: 20,
+      magnitude: 10,
       position: char.position
     }
 

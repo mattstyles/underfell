@@ -13,7 +13,7 @@ export const signal = new Signal({
     factory.create('char', [8, 8]),
     factory.create('light', [2, 2])
   ],
-  map: generate(SIZES.MAP_WIDTH, SIZES.MAP_HEIGHT)
+  map: generate(SIZES.MAP_WIDTH, SIZES.MAP_HEIGHT, 'hello')
 })
 
 export const connect = adaptor(signal)

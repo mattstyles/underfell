@@ -35,8 +35,8 @@ const generateMap = (mat, x, y) => {
   }
 }
 
-const generateSimplex = () => {
-  const rng = seedrandom('hello')
+const generateSimplex = (mat, key) => {
+  const rng = seedrandom(key || 'hello')
   const noise = new FastSimplexNoise({
     max: 1,
     min: 0,
@@ -46,23 +46,23 @@ const generateSimplex = () => {
     persistence: 0.5,
     random: rng
   })
-  return (mat, x, y) => {
+  return (x, y) => {
     let cell = blockFactory.create(noise.scaled([x, y]) < 0.5 ? 0 : 1)
     mat.set(x, y, cell)
     return true
   }
 }
 
-export const generate = (u, v) => {
+export const generate = (u, v, key) => {
   let data = new Array(u * v)
   let mat = ndarray(data, [u, v])
-  let simplex = generateSimplex()
+  let simplex = generateSimplex(mat, key)
 
   // Generate map
   ndIterate(mat, (mat, x, y) => {
     if (generateEdges(mat, x, y)) return
     // if (generateRandom(mat, x, y)) return
-    if (simplex(mat, x, y)) return
+    if (simplex(x, y)) return
     return
   })
 
