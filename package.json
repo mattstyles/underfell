@@ -8,7 +8,7 @@
     "test": "tape -r babel-register spec/*.js",
     "clean": "rimraf dist && mkdirp dist",
     "lint": "standard src",
-    "build-scripts": "NODE_PATH=src NODE_ENV=production browserify --extension=jsx src/main.js | uglifyjs -cm > dist/main.js",
+    "build-scripts": "NODE_PATH=src NODE_ENV=production BABEL_ENV=production browserify --extension=jsx src/main.js | uglifyjs -cm > dist/main.js",
     "build-styles": "lessc src/styles.less --include-path=node_modules:src/core/styles:src --autoprefix='last 2 versions' --clean-css > dist/styles.css",
     "build-html": "cpy src/*.html dist",
     "build-assets": "mkdirp dist/assets && cpy src/assets/* dist/assets",
@@ -51,12 +51,12 @@
     "roguelite"
   ],
   "bugs": {
-    "url": "https://github.com/mattstyles/shattered-sky/issues"
+    "url": "https://github.com/mattstyles/underfell/issues"
   },
-  "homepage": "https://github.com/mattstyles/shattered-sky#readme",
+  "homepage": "https://github.com/mattstyles/underfell#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mattstyles/shattered-sky.git"
+    "url": "git+https://github.com/mattstyles/underfell.git"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
@@ -78,7 +78,8 @@
     "rimraf": "^2.5.4",
     "simple-less-middleware": "^1.1.0",
     "standard": "^8.6.0",
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "uglify-js": "git+https://github.com/mishoo/UglifyJS2.git#harmony"
   },
   "dependencies": {
     "axios": "^0.15.3",
@@ -96,6 +97,7 @@
     "normalize.css": "^5.0.0",
     "quay": "^0.5.0",
     "raid": "^2.1.0",
+    "raid-addons": "^2.0.0",
     "seedrandom": "^2.4.2",
     "to-map": "^1.0.0"
   }
