@@ -1,2 +1,3 @@
 
 import './keydown'
+import './config'

@@ -1,15 +1,65 @@
 
+import ndarray from 'ndarray'
 import {compose} from 'lodash/fp'
+
 import {signal} from 'signals/main'
 import {ACTIONS} from 'core/constants/actions'
-import {GAME_STATES, CHUNK_STATES} from 'core/constants/game'
+import {GAME_STATES} from 'core/constants/game'
 import {getById} from 'core/utils'
+import {checkBounds} from 'core/utils/ndarray'
 import {
   updateVisibility,
   clearVisibility,
   updateLights
 } from 'core/updates/visibility'
 import monit from 'components/monit/monit'
+import {get as getConfig} from 'core/service/config'
+
+const isBlocker = (mat, x, y) => {
+  if (!checkBounds(mat, x, y)) {
+    return false
+  }
+
+  let cell = mat.get(x, y)
+  if (!cell) {
+    console.warn('no cell', x, y)
+    return false
+  }
+
+  return cell.isSolid
+}
+
+const updateMove = map => {
+  let mat = ndarray(map.data, [map.width, map.height])
+
+  return (key, char) => {
+    let desired = [...char.position]
+
+    if (key === '<up>') {
+      desired[1]--
+    }
+
+    if (key === '<down>') {
+      desired[1]++
+    }
+
+    if (key === '<left>') {
+      desired[0]--
+    }
+
+    if (key === '<right>') {
+      desired[0]++
+    }
+
+    if (isBlocker(mat, ...desired) && !getConfig('no_block')) {
+      return false
+    }
+
+    char.position = [desired[0], desired[1]]
+
+    return true
+  }
+}
 
 /**
  * Game running direction/movement key handler
@@ -23,20 +73,8 @@ signal.register((state, event) => {
   if (event.type === ACTIONS.DIRKEYDOWN) {
     let char = getById(state.entities, 'char')
 
-    if (event.payload.key === '<up>') {
-      char.position[1]--
-    }
-
-    if (event.payload.key === '<down>') {
-      char.position[1]++
-    }
-
-    if (event.payload.key === '<left>') {
-      char.position[0]--
-    }
-
-    if (event.payload.key === '<right>') {
-      char.position[0]++
+    if (!updateMove(state.map)(event.payload.key, char)) {
+      return state
     }
 
     monit.time('moving')
