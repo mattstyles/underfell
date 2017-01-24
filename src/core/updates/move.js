@@ -6,7 +6,7 @@ import {signal} from 'signals/main'
 import {ACTIONS} from 'core/constants/actions'
 import {GAME_STATES} from 'core/constants/game'
 import {getById} from 'core/utils'
-import {checkBounds} from 'core/utils/ndarray'
+import {compare} from 'core/utils/ndarray'
 import {
   updateVisibility,
   clearVisibility,
@@ -15,23 +15,12 @@ import {
 import monit from 'components/monit/monit'
 import {get as getConfig} from 'core/service/config'
 
-const isBlocker = (mat, x, y) => {
-  if (!checkBounds(mat, x, y)) {
-    return false
-  }
-
-  let cell = mat.get(x, y)
-  if (!cell) {
-    console.warn('no cell', x, y)
-    return false
-  }
-
-  return cell.isSolid
-}
+const isSolid = cell => cell.isSolid
 
 const updateMove = state => {
   let {map} = state
   let mat = ndarray(map.data, [map.width, map.height])
+  let isBlocker = compare(mat, isSolid)
 
   return (key, char) => {
     let desired = [...char.position]
@@ -52,7 +41,8 @@ const updateMove = state => {
       desired[0]++
     }
 
-    if (isBlocker(mat, ...desired) && !getConfig('no_block')) {
+    // @TODO check if blocker has an onCollision handler
+    if (isBlocker(...desired) && !getConfig('no_block')) {
       return false
     }
 

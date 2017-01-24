@@ -37,3 +37,23 @@ export const checkBounds = (mat, x, y) => {
 
   return true
 }
+
+/**
+ * Provide a matrix and a comparison function and you'll get back a function
+ * that can be used to query the matrix for a given position. Expects that
+ * function returns a boolean but does not enforce it, note that out of bounds
+ * checks _will_ return false.
+ */
+export const compare = (mat, fn) => (x, y) => {
+  if (!checkBounds(mat, x, y)) {
+    return false
+  }
+
+  let cell = mat.get(x, y)
+  if (!cell) {
+    console.warn('no cell', x, y)
+    return false
+  }
+
+  return fn(cell)
+}

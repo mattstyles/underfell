@@ -7,33 +7,34 @@ import {factory as blockFactory} from 'core/models/blocks'
 import {factory as chunkFactory} from 'core/models/chunks'
 import {SIZES} from 'core/constants/game'
 
-window.ndarray = ndarray
-
-import data from '../../../map.json'
+// import data from '../../../map.json'
 
 const generateEdges = (mat, x, y) => {
   let [u, v] = mat.shape
   if (x === 0 || x === u - 1 || y === 0 || y === v - 1) {
-    mat.set(x, y, blockFactory.create(1))
+    mat.set(x, y, blockFactory.create('core:stone_wall'))
     return true
   }
   return false
 }
 
-const generateRandom = (mat, x, y) => {
-  mat.set(x, y, blockFactory.create(Math.random() < 0.3 ? 1 : 0))
-  return true
-}
+// const generateRandom = (mat, x, y) => {
+//   mat.set(x, y, blockFactory.create(Math.random() < 0.3
+//     ? 'core:stone_wall'
+//     : 'core:stone_floor'
+//   ))
+//   return true
+// }
 
-const generateMap = (mat, x, y) => {
-  for (let y = 0; y < mat.shape[1]; y++) {
-    let x = 0
-    data[y].split('').forEach(cell => {
-      mat.set(x, y, blockFactory.create(cell | 0))
-      ++x
-    })
-  }
-}
+// const generateMap = (mat, x, y) => {
+//   for (let y = 0; y < mat.shape[1]; y++) {
+//     let x = 0
+//     data[y].split('').forEach(cell => {
+//       mat.set(x, y, blockFactory.create(cell | 0))
+//       ++x
+//     })
+//   }
+// }
 
 const generateSimplex = (mat, key) => {
   const rng = seedrandom(key || 'hello')
@@ -47,7 +48,10 @@ const generateSimplex = (mat, key) => {
     random: rng
   })
   return (x, y) => {
-    let cell = blockFactory.create(noise.scaled([x, y]) < 0.5 ? 0 : 1)
+    let cell = blockFactory.create(noise.scaled([x, y]) < 0.5
+      ? 'core:stone_floor'
+      : 'core:stone_wall'
+    )
     mat.set(x, y, cell)
     return true
   }

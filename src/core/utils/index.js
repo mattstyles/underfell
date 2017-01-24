@@ -9,6 +9,19 @@ export const getById = (arr, id) => {
 }
 
 /**
+ * Faster find
+ */
+export const find = list => fn => {
+  let i = list.length
+  while (--i >= 0) {
+    if (fn(list[i])) {
+      return list[i]
+    }
+  }
+  return null
+}
+
+/**
  * Rect helper class
  */
 export class Rect {

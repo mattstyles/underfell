@@ -3,7 +3,7 @@ import ndarray from 'ndarray'
 
 import Entities from 'components/entities/entities'
 import {ndMap} from 'core/utils/ndarray'
-import {BLOCK_STATES, SIZES, CHUNK_STATES} from 'core/constants/game'
+import {BLOCK_STATES, SIZES} from 'core/constants/game'
 import {getViewport} from 'core/service/viewport'
 import {Rect} from 'core/utils'
 
@@ -55,7 +55,6 @@ const render = (mat, translate) => {
  * to cells within the chunk, this is not removed from code awaiting testing.
  */
 const Chunk = ({mat, translate}) => {
-  // console.log(translate)
   return (
     <div className='Chunk' style={{
       width: SIZES.CHUNK_WIDTH * SIZES.CELL_WIDTH,
