@@ -3,6 +3,7 @@ import {find} from 'core/utils'
 import {BLOCK_STATES} from 'core/constants/game'
 
 const mineable = (entity, cell) => {
+  // @TODO should emit a signal action
   console.log('You try to mine with your bare hands, not much happens.')
 }
 
@@ -10,6 +11,16 @@ const noisyFloor = (entity, cell) => {
   console.log('The floor is noisy under your feet.')
 }
 
+const squeekyFloor = (entity, cell) => {
+  console.log('The floor squeaks as you step off of it.')
+}
+
+// @TODO there is a current issue here as adding functions to the definitions,
+// and then the map representation, means that the map is no longer serialisable
+// which is probably bad. The traits should add handlers only (i.e. turn
+// core:solid into a block that should be extended) and any props they need to
+// operate and then anything that needs to check should grab the master ref to
+// a trait.
 const traits = [
   {
     id: 'core:solid',
@@ -24,7 +35,6 @@ const traits = [
     id: 'core:mineable',
     create: () => {
       return {
-        // @TODO what gets passed in here
         onCollision: mineable
       }
     }
@@ -33,8 +43,8 @@ const traits = [
     id: 'core:noisy_floor',
     create: () => {
       return {
-        // @TODO what gets passed in here
-        onStep: noisyFloor
+        onEnter: noisyFloor,
+        onExit: squeekyFloor
       }
     }
   }

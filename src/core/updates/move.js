@@ -19,11 +19,15 @@ const isSolid = cell => cell.isSolid
 const identity = cell => cell
 const collision = cell => cell.onCollision
 
-const performMove = (entity, cell, to) => {
-  entity.position = [to[0], to[1]]
+const performMove = (entity, moveTo, from, to) => {
+  if (from.onExit) {
+    from.onExit(entity, from)
+  }
 
-  if (cell.onStep) {
-    cell.onStep(entity)
+  entity.position = [moveTo[0], moveTo[1]]
+
+  if (to.onEnter) {
+    to.onEnter(entity, to)
   }
 }
 
@@ -52,36 +56,28 @@ const updateMove = state => {
       desired[0]++
     }
 
-    let cell = getCell(...desired)
+    let desiredCell = getCell(...desired)
+    let currentCell = getCell(...char.position)
 
-    if (!cell) {
+    if (!desiredCell) {
       return false
     }
 
     if (getConfig('no_block')) {
-      performMove(char, cell, desired)
+      performMove(char, desired, currentCell, desiredCell)
       return true
     }
 
-    if (isSolid(cell)) {
-      if (collision(cell)) {
-        collision(cell)(char)
+    if (isSolid(desiredCell)) {
+      if (collision(desiredCell)) {
+        collision(desiredCell)(char)
       }
 
       return false
     }
 
-    performMove(char, cell, desired)
+    performMove(char, desired, currentCell, desiredCell)
     return true
-
-    // @TODO check if blocker has an onCollision handler
-    // if (isBlocker(...desired) && !getConfig('no_block')) {
-    //   return false
-    // }
-
-    // char.position = [desired[0], desired[1]]
-    //
-    // return true
   }
 }
 
