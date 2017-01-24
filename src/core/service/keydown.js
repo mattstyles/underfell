@@ -41,23 +41,34 @@ export const directionKeyMap = event => {
 /**
  * Turns key presses into a keydown event passing the vkey descriptor
  */
-fromEvent('keydown', quay.stream('*'))
-  .filter(directionKeyFilter)
-  .map(directionKeyMap)
-  .observe(event => {
-    signal.emit({
-      type: ACTIONS.DIRKEYDOWN,
-      payload: event
-    })
-  })
+// fromEvent('keydown', quay.stream('*'))
+//   .filter(directionKeyFilter)
+//   .map(directionKeyMap)
+//   .observe(event => {
+//     signal.emit({
+//       type: ACTIONS.DIRKEYDOWN,
+//       payload: event
+//     })
+//   })
 
+// Use a single stream to stop presses emitting multiple times
 fromEvent('keydown', quay.stream('*'))
   .observe(event => {
+    // Check for direction keys and emit specific value
+    if (directionKeyFilter(event)) {
+      signal.emit({
+        type: ACTIONS.DIRKEYDOWN,
+        payload: directionKeyMap(event)
+      })
+      return
+    }
+
+    // Emit key event
     signal.emit({
       type: ACTIONS.KEYDOWN,
       payload: {
         key: event.key,
-        allKeys: quay.pressed
+        pressed: quay.pressed
       }
     })
   })

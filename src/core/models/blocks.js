@@ -6,6 +6,10 @@ const mineable = (entity, cell) => {
   console.log('You try to mine with your bare hands, not much happens.')
 }
 
+const noisyFloor = (entity, cell) => {
+  console.log('The floor is noisy under your feet.')
+}
+
 const traits = [
   {
     id: 'core:solid',
@@ -22,6 +26,15 @@ const traits = [
       return {
         // @TODO what gets passed in here
         onCollision: mineable
+      }
+    }
+  },
+  {
+    id: 'core:noisy_floor',
+    create: () => {
+      return {
+        // @TODO what gets passed in here
+        onStep: noisyFloor
       }
     }
   }
@@ -44,6 +57,8 @@ const blocks = [
     id: 'core:stone_floor',
     create: () => {
       return {
+        ...trait('core:noisy_floor'),
+
         char: '.',
         color: 'rgb(68, 36, 52)',
         isSolid: false,

@@ -16,11 +16,22 @@ import monit from 'components/monit/monit'
 import {get as getConfig} from 'core/service/config'
 
 const isSolid = cell => cell.isSolid
+const identity = cell => cell
+const collision = cell => cell.onCollision
+
+const performMove = (entity, cell, to) => {
+  entity.position = [to[0], to[1]]
+
+  if (cell.onStep) {
+    cell.onStep(entity)
+  }
+}
 
 const updateMove = state => {
   let {map} = state
   let mat = ndarray(map.data, [map.width, map.height])
-  let isBlocker = compare(mat, isSolid)
+  // let isBlocker = compare(mat, isSolid)
+  let getCell = compare(mat, identity)
 
   return (key, char) => {
     let desired = [...char.position]
@@ -41,14 +52,36 @@ const updateMove = state => {
       desired[0]++
     }
 
-    // @TODO check if blocker has an onCollision handler
-    if (isBlocker(...desired) && !getConfig('no_block')) {
+    let cell = getCell(...desired)
+
+    if (!cell) {
       return false
     }
 
-    char.position = [desired[0], desired[1]]
+    if (getConfig('no_block')) {
+      performMove(char, cell, desired)
+      return true
+    }
 
+    if (isSolid(cell)) {
+      if (collision(cell)) {
+        collision(cell)(char)
+      }
+
+      return false
+    }
+
+    performMove(char, cell, desired)
     return true
+
+    // @TODO check if blocker has an onCollision handler
+    // if (isBlocker(...desired) && !getConfig('no_block')) {
+    //   return false
+    // }
+
+    // char.position = [desired[0], desired[1]]
+    //
+    // return true
   }
 }
 
