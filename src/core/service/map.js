@@ -4,8 +4,6 @@ import seedrandom from 'seedrandom'
 import ndarray from 'ndarray'
 import {ndIterate} from 'core/utils/ndarray'
 import {factory as blockFactory} from 'core/models/blocks'
-import {factory as chunkFactory} from 'core/models/chunks'
-import {SIZES} from 'core/constants/game'
 
 // import data from '../../../map.json'
 
@@ -65,31 +63,13 @@ export const generate = (u, v, key) => {
   // Generate map
   ndIterate(mat, (mat, x, y) => {
     if (generateEdges(mat, x, y)) return
-    // if (generateRandom(mat, x, y)) return
     if (simplex(x, y)) return
     return
   })
 
-  // generateMap(mat, x, y)
-
-  // Generate chunk map
-  let chunks = []
-  for (let i = 0; i < u; i += SIZES.CHUNK_WIDTH) {
-    for (let j = 0; j < v; j += SIZES.CHUNK_HEIGHT) {
-      chunks.push(chunkFactory.create({
-        translate: [i, j]
-      }))
-    }
-  }
-
   return {
     data,
     width: u,
-    height: v,
-    chunks
+    height: v
   }
-}
-
-export const produceChunkData = (mat) => {
-
 }

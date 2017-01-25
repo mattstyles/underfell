@@ -5,7 +5,6 @@ import {Vector2, Ray, clamp} from 'mathutil'
 
 import {ndIterate, checkBounds} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
-// import {getChunk, makeDirty, makeClean} from 'core/models/chunks'
 import {distance} from 'core/utils'
 
 const easing = BezierEasing(0, 0, 0, 1)
@@ -18,7 +17,6 @@ export const clearVisibility = map => {
   ndIterate(mat, (mat, x, y) => {
     makeCellInvisible(mat.get(x, y))
   })
-  // map.chunks.forEach(makeClean)
   return map
 }
 
@@ -87,44 +85,7 @@ const get = (mat, x, y) => {
 /**
  * Takes a ray and projects it forward, executing the callback as it goes.
  * It'll bail if it hits a solid block, firing the callback on the way out.
- * @deprecated in favour of using Ray.cast and generators
  */
-// const castRay = (mat, ray, light, cb) => {
-//   // Check for 0 length ray which would create an infinite while
-//   if (ray.length() <= 0.1) {
-//     return
-//   }
-//
-//   let r = ray
-//   let [x, y] = light.position
-//
-//   // Cast the ray by incrementing its magnitude
-//   while (r.length() < light.magnitude) {
-//     // Get ray current position
-//     let [i, j] = r.position()
-//
-//     // Offset and integerise
-//     let [u, v] = [
-//       x + VISIBILITY.ORIGIN_OFFSET + i | 0,
-//       y + VISIBILITY.ORIGIN_OFFSET + j | 0
-//     ]
-//
-//     let cell = get(mat, u, v)
-//     if (cell) {
-//       // Pass back the cell, the extent of the raycast and the position
-//       cb(cell, 1 - (r.length() / light.magnitude), u, v)
-//     }
-//
-//     // Perform check to see if this ray should continue casting
-//     if (isBlocker(mat, u, v)) {
-//       break
-//     }
-//
-//     // Grow ray scalar to increment cast
-//     r = r.scalar(VISIBILITY.RAY_MAG_INC)
-//   }
-// }
-
 const castRay = options => cb => {
   for (
     let angle = options.startAngle;
@@ -156,30 +117,6 @@ const castRay = options => cb => {
 }
 
 /**
- * Flags a chunk as dirty, used when a cell changes to flag to the renderer to
- * redraw this chunk.
- * @deprecated causing big lag spikes for some reason, getChunk uses find??
- * the issue here is that each cell calls a find on the chunk array, which gets
- * slower when querying chunks at the bottom of the list and sometimes gets
- * super slow. maybe if the chunk array was divided into x, y as those values
- * can be calculated from cell [x, y] and chunk dimensions rather than a linear
- * find operation being spammed. a for loop instead of a find might be enough
- * to make this function tolerable speedwise, its necessary to consider as its
- * the only way to get React cranked up to displaying a large number of tiles.
- */
-const updateChunk = (chunks, x, y) => {
-  return
-
-  // let chunk = getChunk(chunks, x, y)
-  // if (!chunk) {
-  //   console.warn('no chunk found', x, y)
-  //   return chunks
-  // }
-  // makeDirty(chunk)
-  // return chunks
-}
-
-/**
  * Give me a vision and I'll set blocks to be visible
  */
 export const updateVisibility = vision => map => {
@@ -191,7 +128,6 @@ export const updateVisibility = vision => map => {
 
     if (cell) {
       makeCellVisible(cell)
-      updateChunk(map.chunks, u, v)
     }
 
     if (isBlocker(mat, u, v)) {
@@ -261,7 +197,6 @@ const updateLightmap = (map, light) => {
     let l = getLuminance([u, v])
     cell.light += l
 
-    updateChunk(map.chunks, u, v)
     return true
   }
 

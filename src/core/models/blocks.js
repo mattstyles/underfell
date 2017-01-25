@@ -117,6 +117,8 @@ const trait = id => {
   return getTraitById(id).create()
 }
 
+export const getByIndex = index => blocks[index]
+
 /**
  * Instance creator
  */
