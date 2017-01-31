@@ -2,6 +2,7 @@
 import BezierEasing from 'bezier-easing'
 import ndarray from 'ndarray'
 import {Vector2, Ray, clamp} from 'mathutil'
+import {compose} from 'lodash/fp'
 
 import {ndIterate, checkBounds} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
@@ -24,9 +25,10 @@ export const clearVisibility = map => {
  * Takes a cell and makes it visible if it is currently lighted
  */
 const makeCellVisible = cell => {
-  if (cell.light > 0) {
-    cell.state = BLOCK_STATES.VISIBLE
-  }
+  // if (cell.light > 0) {
+  //   cell.state = BLOCK_STATES.VISIBLE
+  // }
+  cell.state = BLOCK_STATES.VISIBLE
 }
 
 /**
@@ -240,3 +242,9 @@ export const updateLights = (lights, vision) => map => {
     })
     .reduce(updateLightmap, map)
 }
+
+export const updateSightmap = (lights, vision) => compose(
+  updateVisibility(vision),
+  updateLights(lights, vision),
+  clearVisibility
+)

@@ -8,9 +8,7 @@ import {GAME_STATES} from 'core/constants/game'
 import {getById} from 'core/utils'
 import {compare} from 'core/utils/ndarray'
 import {
-  updateVisibility,
-  clearVisibility,
-  updateLights
+  updateSightmap
 } from 'core/updates/visibility'
 import monit from 'components/monit/monit'
 import {get as getConfig} from 'core/service/config'
@@ -108,24 +106,24 @@ signal.register((state, event) => {
         position: char.position
       },
       // Wall lights
-      {
-        startAngle: 0,
-        endAngle: Math.PI * 2,
-        magnitude: 2,
-        position: [2, 2]
-      },
-      {
-        startAngle: Math.PI * -2,
-        endAngle: Math.PI,
-        magnitude: 3,
-        position: [15, 0]
-      },
-      {
-        startAngle: Math.PI * 0.5,
-        endAngle: Math.PI * 1.5,
-        magnitude: 3,
-        position: [17, 10]
-      }
+      // {
+      //   startAngle: 0,
+      //   endAngle: Math.PI * 2,
+      //   magnitude: 2,
+      //   position: [2, 2]
+      // },
+      // {
+      //   startAngle: Math.PI * -2,
+      //   endAngle: Math.PI,
+      //   magnitude: 3,
+      //   position: [15, 0]
+      // },
+      // {
+      //   startAngle: Math.PI * 0.5,
+      //   endAngle: Math.PI * 1.5,
+      //   magnitude: 3,
+      //   position: [17, 10]
+      // }
     ]
 
     let vision = {
@@ -135,14 +133,9 @@ signal.register((state, event) => {
       position: char.position
     }
 
-    // @TODO use viewport to clamp cell updates
-
     // Update light and visibility map
-    state.map = compose(
-      updateVisibility(vision),
-      updateLights(lights, vision),
-      clearVisibility
-    )(state.map)
+    // Tacking light on to map data here ensures it updates correctly
+    state.map = updateSightmap(lights, vision)(state.map)
 
     monit.timeEnd('moving')
 
