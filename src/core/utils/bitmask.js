@@ -41,7 +41,7 @@ const generate = () => {
  *   bits('A', 'B')
  *   bits(['A', 'B'], 'C')
  */
-export const bits = (...args) => {
+export const bitmask = (...args) => {
   return args.reduce(generate(), {})
 }
 

@@ -1,6 +1,7 @@
 
 import {find} from 'core/utils'
-import {BLOCK_STATES} from 'core/constants/game'
+// import {BLOCK_STATES} from 'core/constants/game'
+// import {addMask} from 'core/utils/bit'
 
 const mineable = (entity, cell) => {
   // @TODO should emit a signal action
@@ -131,7 +132,7 @@ export const factory = {
 
     return {
       ...block.create(),
-      state: BLOCK_STATES.INVISIBLE,
+      state: 0,  // no flags set
       light: 0
     }
   }

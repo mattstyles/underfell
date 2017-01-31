@@ -7,6 +7,7 @@ import {compose} from 'lodash/fp'
 import {ndIterate, checkBounds} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
 import {distance} from 'core/utils'
+import {addMasks, removeMask} from 'core/utils/bitmask'
 
 const easing = BezierEasing(0, 0, 0, 1)
 
@@ -22,13 +23,16 @@ export const clearVisibility = map => {
 }
 
 /**
- * Takes a cell and makes it visible if it is currently lighted
+ * Takes a cell and makes it visible and discovered if it is currently lighted
  */
 const makeCellVisible = cell => {
-  // if (cell.light > 0) {
-  //   cell.state = BLOCK_STATES.VISIBLE
-  // }
-  cell.state = BLOCK_STATES.VISIBLE
+  if (cell.light > 0) {
+    cell.state = addMasks(cell.state)(
+      BLOCK_STATES.VISIBLE,
+      BLOCK_STATES.DISCOVERED
+    )
+  }
+  // cell.state = BLOCK_STATES.VISIBLE
 }
 
 /**
@@ -37,11 +41,8 @@ const makeCellVisible = cell => {
  * currently visible)
  */
 const makeCellInvisible = cell => {
-  cell.state = cell.state === BLOCK_STATES.INVISIBLE
-    ? BLOCK_STATES.INVISIBLE
-    : BLOCK_STATES.DISCOVERED
-
-  cell.light = 0
+  cell.state = removeMask(cell.state)(BLOCK_STATES.VISIBLE)
+  cell.light = 0.25
 }
 
 /**

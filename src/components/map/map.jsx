@@ -1,8 +1,10 @@
 
 import ndarray from 'ndarray'
+import {clamp} from 'mathutil'
 
 import Entities from 'components/entities/entities'
 import {ndMap} from 'core/utils/ndarray'
+import {hasMask} from 'core/utils/bitmask'
 import {BLOCK_STATES, SIZES} from 'core/constants/game'
 import {getViewport} from 'core/service/viewport'
 
@@ -10,16 +12,13 @@ import {getViewport} from 'core/service/viewport'
  * Render an individual cell
  */
 const renderCell = cell => {
-  if (cell.state === BLOCK_STATES.INVISIBLE) {
+  let has = hasMask(cell.state)
+  if (!has(BLOCK_STATES.DISCOVERED)) {
     return null
   }
 
   let renderProps = {
-    opacity: cell.light
-  }
-
-  if (cell.state === BLOCK_STATES.DISCOVERED) {
-    renderProps.opacity = 0.25
+    opacity: clamp(cell.light, 0.25, 1)
   }
 
   return (

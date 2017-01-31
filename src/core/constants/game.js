@@ -1,13 +1,12 @@
 
 import keyMirror from 'core/utils/keyMirror'
-import bits from 'core/utils/bit'
+import {bitmask} from 'core/utils/bitmask'
 
 export const GAME_STATES = keyMirror('STATE', [
   'RUNNING'
 ])
 
-export const BLOCK_STATES = bits([
-  'INVISIBLE',
+export const BLOCK_STATES = bitmask([
   'DISCOVERED',
   'VISIBLE'
 ])

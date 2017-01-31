@@ -1,6 +1,7 @@
 
 import ndarray from 'ndarray'
 import {BLOCK_STATES, SIZES} from 'core/constants/game'
+import {hasMask} from 'core/utils/bitmask'
 
 const Entities = ({entities, map, translate}) => {
   let mat = ndarray(map.data, [map.width, map.height])
@@ -10,7 +11,7 @@ const Entities = ({entities, map, translate}) => {
       // To save calling mat.get twice we'll mutate here too, naughty
       let cell = mat.get(...entity.position)
       entity.light = cell.light
-      return cell.state === BLOCK_STATES.VISIBLE
+      return hasMask(cell.state)(BLOCK_STATES.VISIBLE)
     })
     .map((entity, i) => {
       let style = {
