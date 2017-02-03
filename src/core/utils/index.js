@@ -22,6 +22,22 @@ export const find = list => fn => {
 }
 
 /**
+ * Creates a new keyed object that stores array indices to speed up lookups
+ * against keys in objects in the list
+ * @example
+ *   byKey([{id: 'a'}, {id: 'b'}], 'id')('a')
+ *   // {id: 'a'}
+ * @returns {function}
+ */
+export const byKey = (list, key) => {
+  let values = list.reduce((values, block, index) => {
+    values[block[key]] = index
+    return values
+  }, {})
+  return value => list[values[value]]
+}
+
+/**
  * Rect helper class
  */
 export class Rect {

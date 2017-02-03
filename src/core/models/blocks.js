@@ -1,5 +1,6 @@
 
-import {find} from 'core/utils'
+import filterObject from 'filter-object'
+import {byKey} from 'core/utils'
 // import {BLOCK_STATES} from 'core/constants/game'
 // import {addMask} from 'core/utils/bit'
 
@@ -25,100 +26,124 @@ const squeekyFloor = (entity, cell) => {
 const traits = [
   {
     id: 'core:solid',
-    create: () => {
-      return {
-        isSolid: true,
-        isOpaque: true
-      }
-    }
+    isSolid: true,
+    isOpaque: true
   },
   {
     id: 'core:mineable',
-    create: () => {
-      return {
-        onCollision: mineable
-      }
-    }
+    onCollision: mineable
   },
   {
     id: 'core:noisy_floor',
-    create: () => {
-      return {
-        onEnter: noisyFloor,
-        onExit: squeekyFloor
-      }
-    }
+    onEnter: noisyFloor,
+    onExit: squeekyFloor
   }
 ]
+
+const getTrait = byKey(traits, 'id')
 
 /**
  * Master immutable block record list
  */
-const blocks = [
+var master = [
   {
     id: 'base:wall',
-    create: () => {
-      return {
-        ...trait('core:solid')
-      }
-    }
+    traits: [
+      'core:solid'
+    ]
   },
   // Stone floor
   {
     id: 'core:stone_floor',
-    create: () => {
-      return {
-        ...trait('core:noisy_floor'),
-
-        char: '.',
-        color: 'rgb(68, 36, 52)',
-        isSolid: false,
-        isOpaque: false
-      }
-    }
+    traits: [
+      'core:noisy_floor'
+    ],
+    char: '.',
+    color: 'rgb(68, 36, 52)',
+    isSolid: false,
+    isOpaque: false
   },
   // Stone block
   {
     id: 'core:stone_wall',
-    create: () => {
-      return {
-        // Inherits from base:wall
-        ...extend('base:wall'),
-
-        ...trait('core:mineable'),
-
-        // Instance members
-        char: '#',
-        color: 'rgb(133, 149, 161)'
-      }
-    }
+    extend: [
+      'base:wall'
+    ],
+    traits: [
+      'core:mineable'
+    ],
+    char: '#',
+    color: 'rgb(133, 149, 161)'
+  },
+  // Fancy wall, for testing really, to see if it will extend from two
+  // levels, via core:stone_wall, and also apply core:stone_floor
+  {
+    id: 'fancy:wall',
+    extend: [
+      'core:stone_wall',
+      'core:stone_floor'
+    ],
+    char: '$'
   }
 ]
 
+const getMaster = byKey(master, 'id')
+
+// Creates a block
+const createBlock = block => {
+  const {traits, extend} = block
+  let out = {}
+
+  // Apply traits
+  if (traits) {
+    out = traits.reduce((b, t) => {
+      let trait = getTrait(t)
+      if (!trait) {
+        return b
+      }
+
+      return {
+        ...filterObject(trait, ['*', '!id']),
+        ...b
+      }
+    }, out)
+  }
+
+  // Apply bases
+  if (extend) {
+    out = extend.reduce((b, e) => {
+      let base = createBlock(getMaster(e))
+      if (!base) {
+        return b
+      }
+
+      return {
+        ...filterObject(base, ['*', '!id']),
+        ...b
+      }
+    }, out)
+  }
+
+  // Filter extend and traits, which have been dealt with
+  return {
+    ...out,
+    ...filterObject(block, ['*', '!extend', '!traits'])
+  }
+}
+
+// Can be passed to [].map to create multiple blocks
+const createBlocks = block => createBlock
+
+// Process block array to create new instances
+var blocks = master.map(createBlocks(master))
+
 /**
- * Block list accessor
+ * Grabs the actual object representing a block
  */
-const finder = find(blocks)
-const traitFinder = find(traits)
-const byId = id => item => item.id === id
+export const getBlock = byKey(blocks, 'id')
 
-export const getById = id => {
-  return finder(byId(id))
-}
-
-export const getTraitById = id => {
-  return traitFinder(byId(id))
-}
-
-const extend = id => {
-  return getById(id).create()
-}
-
-const trait = id => {
-  return getTraitById(id).create()
-}
-
-export const getByIndex = index => blocks[index]
+// console.log(blocks)
+// console.log(getBlock('fancy:wall'))
 
 /**
  * Instance creator
@@ -128,10 +153,9 @@ export const factory = {
    * Creates a new block
    */
   create (id) {
-    let block = getById(id)
-
+    // Creates a minimalist block, ready to store
     return {
-      ...block.create(),
+      id,
       state: 0,  // no flags set
       light: 0
     }
