@@ -87,7 +87,7 @@ console.log(blocks)
  */
 export const getBlock = (id, block = {}) => {
   return {
-    ...byKey(blocks, 'id'),
+    ...byKey(blocks, 'id')(id),
     ...block
   }
 }

@@ -7,7 +7,7 @@ import {compose} from 'lodash/fp'
 import {ndIterate, checkBounds} from 'core/utils/ndarray'
 import {BLOCK_STATES, VISIBILITY} from 'core/constants/game'
 import {distance} from 'core/utils'
-import {addMasks, removeMask} from 'core/utils/bitmask'
+import {addMasks, removeMask, hasMask} from 'core/utils/bitmask'
 
 const easing = BezierEasing(0, 0, 0, 1)
 
@@ -60,7 +60,7 @@ const isBlocker = (mat, x, y) => {
     return false
   }
 
-  return cell.isOpaque
+  return hasMask(cell.state)(BLOCK_STATES.OPAQUE)
 }
 
 /**

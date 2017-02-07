@@ -1,19 +1,19 @@
 
 import ndarray from 'ndarray'
-import {compose} from 'lodash/fp'
+// import {compose} from 'lodash/fp'
 
 import {signal} from 'signals/main'
 import {ACTIONS} from 'core/constants/actions'
-import {GAME_STATES} from 'core/constants/game'
+import {GAME_STATES, BLOCK_STATES} from 'core/constants/game'
 import {getById} from 'core/utils'
 import {compare} from 'core/utils/ndarray'
-import {
-  updateSightmap
-} from 'core/updates/visibility'
+import {hasMask} from 'core/utils/bitmask'
+import {updateSightmap} from 'core/updates/visibility'
 import monit from 'components/monit/monit'
 import {get as getConfig} from 'core/service/config'
+import {getBlock} from 'core/models/blocks'
 
-const isSolid = cell => cell.isSolid
+const isSolid = cell => hasMask(cell.state)(BLOCK_STATES.SOLID)
 const identity = cell => cell
 const collision = cell => cell.onCollision
 
@@ -61,20 +61,23 @@ const updateMove = state => {
       return false
     }
 
+    let des = getBlock(desiredCell.id)
+    let current = getBlock(currentCell.id)
+
     if (getConfig('no_block')) {
-      performMove(char, desired, currentCell, desiredCell)
+      performMove(char, desired, current, des)
       return true
     }
 
-    if (isSolid(desiredCell)) {
-      if (collision(desiredCell)) {
-        collision(desiredCell)(char)
+    if (isSolid(des)) {
+      if (collision(des)) {
+        collision(des)(char)
       }
 
       return false
     }
 
-    performMove(char, desired, currentCell, desiredCell)
+    performMove(char, desired, current, des)
     return true
   }
 }

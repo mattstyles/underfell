@@ -7,6 +7,7 @@ import {ndMap} from 'core/utils/ndarray'
 import {hasMask} from 'core/utils/bitmask'
 import {BLOCK_STATES, SIZES} from 'core/constants/game'
 import {getViewport} from 'core/service/viewport'
+import {getBlock} from 'core/models/blocks'
 
 /**
  * Render an individual cell
@@ -40,7 +41,8 @@ const renderCell = cell => {
  */
 const render = (mat, translate) => {
   return ndMap(mat, (mat, x, y) => {
-    let block = mat.get(x, y)
+    let blockRep = mat.get(x, y)
+    let block = getBlock(blockRep.id, blockRep)
     return renderCell({
       ...block,
       position: [x + translate[0], y + translate[1]]
