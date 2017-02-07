@@ -8,7 +8,9 @@ export const GAME_STATES = keyMirror('STATE', [
 
 export const BLOCK_STATES = bitmask([
   'DISCOVERED',
-  'VISIBLE'
+  'VISIBLE',
+  'OPAQUE',
+  'SOLID'
 ])
 
 // font-size 14px, [9, 16]
